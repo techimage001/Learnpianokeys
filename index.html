@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Learn Piano Keys · Practice piano online with real feedback</title>
+<meta name="description" content="A browser piano studio that listens while you play. Wait mode, section looping, hand separation, tempo control, fingering and a grand staff. Works with a MIDI keyboard or your computer keys.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#14100F">
+<link rel="canonical" href="https://learnpianokeys.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Learn Piano Keys">
+<meta property="og:title" content="Learn Piano Keys · Practice piano online with real feedback">
+<meta property="og:description" content="Wait mode, looping, hand separation, tempo control, fingering and a grand staff. No card, no trial clock.">
+<meta property="og:url" content="https://learnpianokeys.com/">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css?v=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>Piano Keys</a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false">Menu</button>
+    <nav class="nav" id="nav">
+      <a href="#pieces">Pieces</a>
+      <a href="#how">How it works</a>
+      <a href="#compare">What is free</a>
+      <a href="#faq">Questions</a>
+      <a class="btn btn-primary btn-sm" href="app.html">Open the practice room</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">A practice room in your browser</p>
+    <h1>Learn the keys.<br>Not just the <em>pattern</em>.</h1>
+    <p class="lede">Most piano apps score you on hitting coloured bars as they land. You get quick wins and, a year later, you still cannot read a page of music. This one grades your notes, your timing and your reading separately, so you can see which of the three you are actually improving.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="app.html">Start playing</a>
+      <a class="btn btn-ghost" href="#compare">See what costs money elsewhere</a>
+    </div>
+    <p class="hero-note">Free, no card, no trial countdown · works with any MIDI keyboard · nothing to install</p>
+  </div>
+
+  <div class="keybed-stage">
+    <p class="keybed-hint">Play it. Click the keys, or use your A to K row.</p>
+    <div class="keybed"><div class="keys" id="heroKeys"></div></div>
+  </div>
+</section>
+
+<section id="pieces">
+  <div class="wrap">
+    <p class="eyebrow">Start here</p>
+    <h2>Three pieces, three stages</h2>
+    <p class="lede" style="margin-bottom:28px">Every piece on this site is out of copyright, which is exactly why we can give you the whole thing instead of the first sixteen bars.</p>
+    <div class="grid" style="gap:12px">
+      <a class="piece" href="app.html?piece=twinkle">
+        <span class="piece-lvl">1</span>
+        <span>
+          <span class="piece-t">Twinkle, Twinkle, Little Star</span><br>
+          <span class="piece-c">Traditional · five notes, one hand position, no black keys</span>
+        </span>
+        <span class="piece-go">Play &rarr;</span>
+      </a>
+      <a class="piece" href="app.html?piece=ode-to-joy">
+        <span class="piece-lvl">2</span>
+        <span>
+          <span class="piece-t">Ode to Joy</span><br>
+          <span class="piece-c">Beethoven, 1824 · the whole melody under five fingers</span>
+        </span>
+        <span class="piece-go">Play &rarr;</span>
+      </a>
+      <a class="piece" href="app.html?piece=fur-elise">
+        <span class="piece-lvl">3</span>
+        <span>
+          <span class="piece-t">Für Elise</span><br>
+          <span class="piece-c">Beethoven, 1810 · the full opening section, both hands, with fingering</span>
+        </span>
+        <span class="piece-go">Play &rarr;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2>Three scores, not one</h2>
+    <div class="grid g3" style="margin-top:32px">
+      <div class="card">
+        <span class="card-num">01 / NOTES</span>
+        <h3>Did you play the right key?</h3>
+        <p class="muted">The obvious one, and the only one most apps measure. Useful, but it is the easiest of the three to fake by memorising where the bars fall.</p>
+      </div>
+      <div class="card">
+        <span class="card-num">02 / TIME</span>
+        <h3>Did you play it when you should have?</h3>
+        <p class="muted">Graded separately, because right notes at the wrong moment is the single most common thing that makes self-taught playing sound self-taught.</p>
+      </div>
+      <div class="card">
+        <span class="card-num">03 / READING</span>
+        <h3>Could you do it from the page?</h3>
+        <p class="muted">Switch on read mode and the falling notes disappear, leaving the staff. Anything you play then counts towards your literacy score. Nothing else counts.</p>
+      </div>
+    </div>
+    <p class="lede" style="margin-top:30px">Underneath that sit the tools you would expect: wait mode holds the music until your fingers arrive, loop any bar or run of bars, practise one hand while the other plays itself, slow the tempo to a crawl, and show or hide fingering and note names as you outgrow them.</p>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="wrap">
+    <p class="eyebrow">What is free here</p>
+    <h2>The paywall, and where it usually sits</h2>
+    <p class="lede" style="margin-bottom:28px">Typical piano apps run about £90 to £150 a year, and the features below are almost always on the paid side of the line. None of them cost anything to run in a browser, which is why they are all switched on here.</p>
+    <div class="table-scroll">
+      <table class="compare">
+        <thead>
+          <tr><th>Feature</th><th>Typical piano app</th><th>Learn Piano Keys</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Full lesson path</td><td class="no">Two courses, then paid</td><td class="yes">All of it</td></tr>
+          <tr><td>Wait mode</td><td class="no">Paid</td><td class="yes">Free</td></tr>
+          <tr><td>Loop a section</td><td class="no">Paid</td><td class="yes">Free</td></tr>
+          <tr><td>Practise hands separately</td><td class="no">Paid</td><td class="yes">Free</td></tr>
+          <tr><td>Slow the tempo down</td><td class="no">Paid</td><td class="yes">Free</td></tr>
+          <tr><td>Fingering on every note</td><td class="no">Often missing entirely</td><td class="yes">Free</td></tr>
+          <tr><td>Grand staff alongside the guide</td><td class="no">Paid, or tablet only</td><td class="yes">Free</td></tr>
+          <tr><td>Metronome</td><td class="no">Sold as a separate app</td><td class="yes">Free</td></tr>
+          <tr><td>Rhythm graded separately</td><td class="no">Rarely measured at all</td><td class="yes">Free</td></tr>
+          <tr><td>Reading measured separately</td><td class="no">Not offered</td><td class="yes">Free</td></tr>
+          <tr><td>MIDI keyboard support</td><td class="no">Paid on some plans</td><td class="yes">Free</td></tr>
+          <tr><td>Card details to start</td><td class="no">Usually required for the trial</td><td class="yes">Never</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <p class="eyebrow">Questions</p>
+    <h2>Before you start</h2>
+    <div style="margin-top:24px">
+      <details class="faq"><summary>Do I need a real piano?</summary>
+        <p>No. You can play with your computer keys or by clicking the on-screen keyboard, and everything still works, including the scoring. A MIDI keyboard is better because it sends the exact note and the exact moment you pressed it, so the timing score means something. Any digital piano with a USB socket will do.</p>
+      </details>
+      <details class="faq"><summary>Why can I not learn current pop songs here?</summary>
+        <p>Because arrangements of songs still in copyright have to be licensed title by title from the publisher, and those licences are what the paid apps are really charging you for. Rather than charge you for that, this site sticks to music that is out of copyright, where we can give you the complete piece rather than a locked preview.</p>
+      </details>
+      <details class="faq"><summary>What is the literacy score actually measuring?</summary>
+        <p>Only the notes you played with the falling guide switched off, reading from the staff. It is deliberately harder to move than the other two numbers. If your note accuracy is high and your literacy score is not, you are memorising positions rather than reading music, which is the thing most people discover far too late.</p>
+      </details>
+      <details class="faq"><summary>Does it work on a phone?</summary>
+        <p>It runs, and you can tap the keys, but a phone screen is too narrow to show a useful stretch of the keyboard. A tablet propped on the music desk, or a laptop, is a much better experience.</p>
+      </details>
+      <details class="faq"><summary>Will it always be free?</summary>
+        <p>The tools on this page are free and there is no trial clock on them. If a paid plan is ever added it will be for new material rather than by switching off something you are already using.</p>
+      </details>
+      <details class="faq"><summary>Does my playing get sent anywhere?</summary>
+        <p>No. The scoring, the sound and the notation all run inside your browser. Nothing you play leaves your device.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>Play</h4>
+        <a href="app.html?piece=twinkle">Twinkle, Twinkle</a>
+        <a href="app.html?piece=ode-to-joy">Ode to Joy</a>
+        <a href="app.html?piece=fur-elise">Für Elise</a>
+      </div>
+      <div>
+        <h4>Learn</h4>
+        <a href="#how">How the scoring works</a>
+        <a href="#compare">What is free</a>
+        <a href="#faq">Questions</a>
+      </div>
+      <div>
+        <h4>Site</h4>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+    <p class="foot-legal">
+      Learn Piano Keys. All music on this site is in the public domain. All sound is synthesised in your browser; no recordings are used.
+    </p>
+  </div>
+</footer>
+
+<script src="assets/engine.js?v=1"></script>
+<script src="assets/site.js?v=1"></script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://learnpianokeys.com/#website",
+      "url": "https://learnpianokeys.com/",
+      "name": "Learn Piano Keys",
+      "description": "A browser piano practice studio with wait mode, looping, hand separation, tempo control, fingering and a grand staff.",
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://learnpianokeys.com/#app",
+      "name": "Learn Piano Keys",
+      "url": "https://learnpianokeys.com/app.html",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any modern web browser",
+      "browserRequirements": "Requires JavaScript and the Web Audio API",
+      "featureList": [
+        "Wait mode",
+        "Section looping",
+        "Practise hands separately",
+        "Tempo control",
+        "Fingering on every note",
+        "Grand staff notation",
+        "Metronome",
+        "Separate rhythm scoring",
+        "Separate reading literacy scoring",
+        "MIDI keyboard input"
+      ],
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "GBP" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://learnpianokeys.com/#faq",
+      "mainEntity": [
+        { "@type": "Question", "name": "Do I need a real piano?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. You can play with your computer keys or by clicking the on-screen keyboard, and everything still works, including the scoring. A MIDI keyboard is better because it sends the exact note and the exact moment you pressed it, so the timing score means something. Any digital piano with a USB socket will do." } },
+        { "@type": "Question", "name": "Why can I not learn current pop songs here?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Because arrangements of songs still in copyright have to be licensed title by title from the publisher, and those licences are what the paid apps are really charging you for. Rather than charge you for that, this site sticks to music that is out of copyright, where we can give you the complete piece rather than a locked preview." } },
+        { "@type": "Question", "name": "What is the literacy score actually measuring?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Only the notes you played with the falling guide switched off, reading from the staff. It is deliberately harder to move than the other two numbers. If your note accuracy is high and your literacy score is not, you are memorising positions rather than reading music, which is the thing most people discover far too late." } },
+        { "@type": "Question", "name": "Does it work on a phone?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It runs, and you can tap the keys, but a phone screen is too narrow to show a useful stretch of the keyboard. A tablet propped on the music desk, or a laptop, is a much better experience." } },
+        { "@type": "Question", "name": "Will it always be free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The tools on this page are free and there is no trial clock on them. If a paid plan is ever added it will be for new material rather than by switching off something you are already using." } },
+        { "@type": "Question", "name": "Does my playing get sent anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The scoring, the sound and the notation all run inside your browser. Nothing you play leaves your device." } }
+      ]
+    }
+  ]
+}
+</script>
+</body>
+</html>

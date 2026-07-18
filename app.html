@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Practice room · Learn Piano Keys</title>
+<meta name="description" content="Practice piano in your browser with wait mode, loop, hand separation, tempo control, fingering and a grand staff. Works with a MIDI keyboard or your computer keys.">
+<meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#14100F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css?v=1">
+<link rel="stylesheet" href="assets/app.css?v=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>Piano Keys</a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false">Menu</button>
+    <nav class="nav" id="nav">
+      <a href="index.html#pieces">Pieces</a>
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#compare">What is free</a>
+    </nav>
+  </div>
+</header>
+
+<main class="stage">
+
+  <div class="stage-head">
+    <div>
+      <h1 id="pieceTitle">Twinkle, Twinkle, Little Star</h1>
+      <div class="stage-meta" id="pieceMeta"></div>
+    </div>
+    <div class="picker">
+      <span class="badge" id="midiBadge">Checking for MIDI…</span>
+      <select id="pieceSel" aria-label="Choose a piece"></select>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="instrument">
+        <div class="staff-wrap"><canvas id="staff" aria-label="Grand staff notation"></canvas></div>
+        <div class="roll-wrap">
+          <canvas id="roll" aria-label="Falling note guide"></canvas>
+          <div class="judge" id="judge"></div>
+          <div class="wait-badge" id="waitBadge">waiting for you</div>
+        </div>
+        <div class="keybed in-app"><div class="keys" id="keys"></div></div>
+      </div>
+
+      <div class="transport">
+        <button class="btn btn-primary btn-sm" id="playBtn">Play</button>
+        <button class="btn btn-ghost btn-sm" id="restartBtn">Restart</button>
+        <div class="tempo">
+          <label for="bpm">Tempo</label>
+          <input type="range" id="bpm" min="30" max="160" value="88">
+          <output id="bpmOut">88</output>
+        </div>
+        <div class="spacer"></div>
+        <div class="pill-row">
+          <span class="label">Hands</span>
+          <button class="pill active" data-hand="both">Both</button>
+          <button class="pill" data-hand="l">Left</button>
+          <button class="pill" data-hand="r">Right</button>
+        </div>
+      </div>
+
+      <div class="pcard" style="margin-top:20px">
+        <h3>Practice tools</h3>
+        <div class="pill-row">
+          <button class="pill" id="waitMode" aria-pressed="true">Wait mode</button>
+          <button class="pill" id="readMode" aria-pressed="false">Read mode</button>
+          <button class="pill" id="fingerMode" aria-pressed="true">Fingering</button>
+          <button class="pill" id="nameMode" aria-pressed="true">Note names</button>
+          <button class="pill" id="metroMode" aria-pressed="false">Metronome</button>
+          <button class="pill" id="accompMode" aria-pressed="true">Play other hand</button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="pcard">
+        <h3>This session</h3>
+        <div class="scores">
+          <div class="score-row acc"><span class="score-val" id="accVal">·</span><span class="score-lab">Right notes</span></div>
+          <div class="score-row tim"><span class="score-val" id="timVal">·</span><span class="score-lab">In time</span></div>
+        </div>
+      </div>
+
+      <div class="pcard" id="readCard">
+        <h3>Literacy score</h3>
+        <div class="score-row lit"><span class="score-val" id="litVal">·</span><span class="score-lab">Read from the staff</span></div>
+        <p class="score-note" id="litCount">Turn on Read mode to build this</p>
+        <p class="score-note">This only counts notes you played with the falling guide switched off. It is the number that tells you whether you are reading music or memorising bar positions.</p>
+      </div>
+
+      <div class="pcard">
+        <h3>Loop a section <span style="float:right;font-family:var(--mono);color:var(--brass)" id="loopOut">off</span></h3>
+        <div class="bars" id="bars"></div>
+        <p class="score-note" style="margin-top:12px">Tap a bar to loop it. Tap a later bar to extend the loop.
+          <button class="pill" id="clearLoop" style="padding:4px 10px;font-size:.75rem;margin-top:8px">Clear loop</button>
+        </p>
+      </div>
+
+      <div class="pcard">
+        <h3>Teacher's note</h3>
+        <p class="tip" id="pieceTip"></p>
+      </div>
+
+      <div class="pcard">
+        <h3>No keyboard nearby?</h3>
+        <p class="keyhelp">
+          Play with your computer keys: <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>G</kbd> <kbd>H</kbd> <kbd>J</kbd> <kbd>K</kbd> for the white notes,
+          <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> for the black ones.<br>
+          <kbd>Z</kbd> / <kbd>X</kbd> shift an octave · <kbd>Space</kbd> play or pause · <kbd>R</kbd> read mode.
+        </p>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div class="hint" id="hint"></div>
+
+<script src="assets/pieces.js?v=1"></script>
+<script src="assets/engine.js?v=1"></script>
+<script src="assets/app.js?v=1"></script>
+<script>
+  document.getElementById('navToggle').addEventListener('click', function () {
+    var n = document.getElementById('nav');
+    n.classList.toggle('open');
+    this.setAttribute('aria-expanded', n.classList.contains('open'));
+  });
+</script>
+</body>
+</html>
