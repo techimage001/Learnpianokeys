@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Free Piano Tools · Chord finder, scale explorer, metronome and note quiz</title>
+  <meta name="description" content="Four practice tools that run entirely in your browser. Find any chord, see any scale on the keyboard, keep time with a tap-tempo metronome and test how fast you can name a key.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#14100F">
+  <link rel="canonical" href="https://learnpianokeys.com/tools.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Learn Piano Keys">
+  <meta property="og:title" content="Free Piano Tools · Chord finder, scale explorer, metronome and note quiz">
+  <meta property="og:description" content="Four practice tools that run entirely in your browser. Find any chord, see any scale on the keyboard, keep time with a tap-tempo metronome and test how fast you can name a key.">
+  <meta property="og:url" content="https://learnpianokeys.com/tools.html">
+  <meta property="og:image" content="https://learnpianokeys.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Free Piano Tools · Chord finder, scale explorer, metronome and note quiz">
+  <meta name="twitter:description" content="Four practice tools that run entirely in your browser. Find any chord, see any scale on the keyboard, keep time with a tap-tempo metronome and test how fast you can name a key.">
+  <meta name="twitter:image" content="https://learnpianokeys.com/og-image.png">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png">
+  <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png">
+  <link rel="icon" href="/favicon-192.png" sizes="192x192" type="image/png">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css?v=3">
+  <script>(function(){try{var t=localStorage.getItem('lpk.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to the main content</a>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span>Piano Keys</a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="/piano-keys-for-beginners.html">Start here</a>
+      <a href="/#pieces">Pieces</a>
+      <a href="/tools.html" aria-current="page">Tools</a>
+      <a href="/practice.html">Practice</a>
+      <a href="/#compare">What is free</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark">Light</button>
+      <a class="btn btn-primary btn-sm" href="/app.html">Practice room</a>
+    </nav>
+  </div>
+</header>
+
+<nav class="crumbs" aria-label="Breadcrumb"><div class="wrap"><a href="/">Home</a><span class="sep">/</span><span aria-current="page">Tools</span></div></nav>
+<main id="main">
+<section class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">Practice tools</p>
+    <h1>Chords, scales and time</h1>
+    <p class="lede">Four tools that run entirely inside your browser. Nothing is uploaded, nothing needs an account, and there is no usage limit on any of them.</p>
+  </div>
+</section>
+
+<section id="chords">
+  <div class="wrap">
+    <div class="grid g2">
+      <div class="card tool">
+        <span class="card-num">CHORD FINDER</span>
+        <h2>See every note in a chord</h2>
+        <div class="tool-row">
+          <label class="field"><span>Root</span><select id="chordRoot"></select></label>
+          <label class="field"><span>Chord</span><select id="chordType"></select></label>
+          <button class="btn btn-primary btn-sm" id="chordPlay">Play it</button>
+        </div>
+        <p class="tool-read"><strong id="chordName">C major</strong><span id="chordNotes">C · E · G</span></p>
+        <div class="keybed short"><div class="keys" id="chordKeys" role="img" aria-label="Chord shown on the keyboard"></div></div>
+        <p class="score-note" id="chordWhy"></p>
+      </div>
+
+      <div class="card tool" id="scales">
+        <span class="card-num">SCALE EXPLORER</span>
+        <h2>Learn scales as a shape</h2>
+        <div class="tool-row">
+          <label class="field"><span>Root</span><select id="scaleRoot"></select></label>
+          <label class="field"><span>Scale</span><select id="scaleType"></select></label>
+          <button class="btn btn-primary btn-sm" id="scalePlay">Play it</button>
+        </div>
+        <p class="tool-read"><strong id="scaleName">C major</strong><span id="scaleNotes">C · D · E · F · G · A · B · C</span></p>
+        <div class="keybed short"><div class="keys" id="scaleKeys" role="img" aria-label="Scale shown on the keyboard"></div></div>
+        <p class="score-note" id="scaleWhy"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="metronome">
+  <div class="wrap">
+    <div class="grid g2">
+      <div class="card tool">
+        <span class="card-num">METRONOME</span>
+        <h2>Stay in time</h2>
+        <p class="metro-bpm"><strong id="metroBpm">80</strong> <span>BPM</span></p>
+        <input type="range" id="metroRange" min="30" max="220" value="80" aria-label="Tempo in beats per minute">
+        <div class="tool-row" style="margin-top:14px">
+          <button class="btn btn-primary btn-sm" id="metroStart">Start</button>
+          <button class="btn btn-ghost btn-sm" id="metroTap">Tap tempo</button>
+          <label class="field"><span>Beats per bar</span>
+            <select id="metroBeats">
+              <option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option>
+            </select>
+          </label>
+        </div>
+        <div class="beat-lights" id="beatLights" aria-hidden="true"></div>
+        <p class="score-note">Tap the tap-tempo button four times in the rhythm you want and it will work out the speed.</p>
+      </div>
+
+      <div class="card tool" id="quiz">
+        <span class="card-num">NOTE QUIZ</span>
+        <h2>Find the key</h2>
+        <p class="quiz-ask" id="quizAsk">Press start, then click the key it asks for.</p>
+        <div class="quiz-score">
+          <span>Score <strong id="quizScore">0</strong></span>
+          <span>Best run <strong id="quizBest">0</strong></span>
+        </div>
+        <div class="keybed short"><div class="keys" id="quizKeys" role="group" aria-label="Quiz keyboard"></div></div>
+        <div class="tool-row" style="margin-top:12px">
+          <button class="btn btn-primary btn-sm" id="quizStart">Start quiz</button>
+          <label class="field"><span>Include</span>
+            <select id="quizMode">
+              <option value="white">White keys only</option>
+              <option value="all">White and black keys</option>
+            </select>
+          </label>
+        </div>
+        <p class="score-note" id="quizFeedback">Your best run is kept in this browser.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tools-faq">
+  <div class="wrap" style="max-width:820px">
+    <p class="eyebrow">Questions</p>
+    <h2>About these tools</h2>
+    <div style="margin-top:24px">
+      <details class="faq"><summary>What notes are in a C major chord?</summary>
+        <p>C, E and G. A major chord is built by taking a root note, counting up four semitones for the middle note and another three for the top one. Change the root and the same shape gives you any major chord, which is why it is worth learning the pattern rather than the letters.</p>
+      </details>
+      <details class="faq"><summary>What is the difference between a major and a minor chord?</summary>
+        <p>One note. The middle note of a minor chord sits one semitone lower than in the major. That single semitone is the whole difference between the bright sound and the sad one, and you can hear it by switching the chord type above and pressing play twice.</p>
+      </details>
+      <details class="faq"><summary>Which scale should a beginner learn first?</summary>
+        <p>C major, because it uses only white keys and lets you concentrate on your fingers rather than on where the black notes are. After that, G major and F major each add a single black key, so they are the natural next two.</p>
+      </details>
+      <details class="faq"><summary>What tempo should I practise at?</summary>
+        <p>Slower than feels satisfying. A useful rule is to find the fastest speed at which you can play a passage with no mistakes at all, then take ten off it. Speed comes from repetition at a tempo you can control, not from repetition at a tempo you cannot.</p>
+      </details>
+      <details class="faq"><summary>Do these tools need an account?</summary>
+        <p>No. Every tool on this page is unlimited and needs nothing from you. Your best quiz run is saved in your own browser and never sent anywhere.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h2>Learn</h2>
+        <a href="/piano-keys-for-beginners.html">Piano keys for beginners</a>
+        <a href="/#paths">Learning paths</a>
+        <a href="/#basics">Piano keys explained</a>
+      </div>
+      <div>
+        <h2>Play</h2>
+        <a href="/app.html?piece=twinkle">Twinkle, Twinkle</a>
+        <a href="/app.html?piece=ode-to-joy">Ode to Joy</a>
+        <a href="/app.html?piece=fur-elise">F&uuml;r Elise</a>
+      </div>
+      <div>
+        <h2>Tools</h2>
+        <a href="/tools.html#chords">Chord finder</a>
+        <a href="/tools.html#scales">Scale explorer</a>
+        <a href="/tools.html#metronome">Metronome</a>
+        <a href="/practice.html">Practice tracker</a>
+      </div>
+      <div>
+        <h2>Site</h2>
+        <a href="/contact.html">Contact</a>
+        <a href="/privacy.html">Privacy</a>
+        <a href="/terms.html">Terms</a>
+      </div>
+    </div>
+    <p class="foot-legal">
+      Learn Piano Keys · info@learnpianokeys.com<br>
+      Every piece on this site is in the public domain and all sound is synthesised in your browser. No recordings are used.
+    </p>
+  </div>
+</footer>
+
+<div class="hint" id="hint"></div>
+<div id="sr" class="sr-only" role="status" aria-live="polite"></div>
+
+<script src="/assets/engine.js?v=3"></script>
+<script src="/assets/site.js?v=3"></script>
+<script src="/assets/tools.js?v=3"></script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://learnpianokeys.com/#org",
+      "name": "Learn Piano Keys",
+      "url": "https://learnpianokeys.com/",
+      "logo": "https://learnpianokeys.com/favicon-512.png",
+      "email": "info@learnpianokeys.com"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://learnpianokeys.com/#website",
+      "url": "https://learnpianokeys.com/",
+      "name": "Learn Piano Keys",
+      "publisher": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "inLanguage": "en-GB"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://learnpianokeys.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Tools",
+          "item": "https://learnpianokeys.com/tools.html"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://learnpianokeys.com/tools.html#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What notes are in a C major chord?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "C, E and G. A major chord is built by taking a root note, counting up four semitones for the middle note and another three for the top one. Change the root and the same shape gives you any major chord, which is why it is worth learning the pattern rather than the letters."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between a major and a minor chord?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "One note. The middle note of a minor chord sits one semitone lower than in the major. That single semitone is the whole difference between the bright sound and the sad one, and you can hear it by switching the chord type above and pressing play twice."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which scale should a beginner learn first?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "C major, because it uses only white keys and lets you concentrate on your fingers rather than on where the black notes are. After that, G major and F major each add a single black key, so they are the natural next two."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What tempo should I practise at?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Slower than feels satisfying. A useful rule is to find the fastest speed at which you can play a passage with no mistakes at all, then take ten off it. Speed comes from repetition at a tempo you can control, not from repetition at a tempo you cannot."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do these tools need an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Every tool on this page is unlimited and needs nothing from you. Your best quiz run is saved in your own browser and never sent anywhere."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</body>
+</html>
