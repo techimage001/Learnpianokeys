@@ -117,6 +117,11 @@ main.narrow h2 { font-size: 1.25rem; font-family: var(--body); font-weight: 600;
 .nav a { color: var(--ivory-2); font-size: .92rem; white-space: nowrap; }
 .nav a:hover, .nav a[aria-current] { color: var(--ivory); text-decoration: none; }
 .nav a[aria-current] { border-bottom: 1px solid var(--brass); }
+/* Buttons keep their own text colour inside the nav. Without these the
+   .nav a rule wins on specificity and brass buttons lose their contrast. */
+.nav a.btn-primary, .nav a.btn-primary:hover { color: var(--brass-ink); border-bottom: 0; }
+.nav a.btn-ghost, .nav a.btn-ghost:hover { color: var(--ivory); border-bottom: 0; }
+.nav a.pill, .nav a.pill:hover { border-bottom: 0; }
 .nav-toggle {
   display: none; margin-left: auto; background: none;
   border: 1px solid var(--ink-4); color: var(--ivory);
@@ -534,4 +539,70 @@ kbd {
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
+}
+
+
+/* ---- v4 additions ---- */
+
+/* account control */
+.acct { position: relative; }
+.acct-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--brass); color: var(--brass-ink);
+  border: 0; font: inherit; font-weight: 600; font-size: .9rem;
+  cursor: pointer; display: grid; place-items: center; line-height: 1;
+}
+.acct-menu {
+  position: absolute; right: 0; top: 42px; min-width: 230px;
+  background: var(--ink-2); border: 1px solid var(--ink-3);
+  border-radius: var(--r); padding: 14px; box-shadow: var(--shadow); z-index: 70;
+}
+.acct-menu[hidden] { display: none; }
+.acct-email { font-size: .86rem; margin: 0 0 4px; word-break: break-all; color: var(--ivory); }
+.acct-state { font-family: var(--mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--good); margin: 0 0 12px; }
+.signin[hidden], .acct[hidden] { display: none; }
+
+/* the signup card */
+.gate-card { position: relative; }
+.gate-close {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: 0; color: var(--ivory-3);
+  font-size: 1.7rem; line-height: 1; cursor: pointer; padding: 4px 8px;
+}
+.gate-close:hover { color: var(--ivory); }
+.gate-close[hidden] { display: none; }
+
+/* the invitation, which is an offer rather than a countdown */
+.invite {
+  display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+  background: var(--ink-2); border: 1px solid var(--brass-dim);
+  border-radius: var(--r); padding: 16px 20px; margin-bottom: 18px;
+}
+.invite[hidden] { display: none; }
+.invite p { margin: 0; flex: 1 1 320px; font-size: .92rem; color: var(--ivory-2); }
+.invite strong { color: var(--ivory); }
+.invite-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* resume line and progress tags */
+.resume {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  font-size: .88rem; margin: 22px 0 0; color: var(--ivory-2);
+}
+.resume[hidden] { display: none; }
+.resume-tag {
+  font-family: var(--mono); font-size: .66rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--brass);
+  border: 1px solid var(--brass-dim); border-radius: 999px; padding: 3px 9px;
+}
+.resume .sep { color: var(--ivory-3); opacity: .6; }
+.progress-tag {
+  font-family: var(--mono); font-size: .62rem; letter-spacing: .1em;
+  color: var(--good); border: 1px solid currentColor; border-radius: 999px;
+  padding: 1px 7px; margin-left: 8px; text-transform: none;
+}
+.progress-tag[hidden] { display: none; }
+
+@media (max-width: 860px) {
+  .acct-menu { right: auto; left: 0; }
+  .invite { padding: 14px 16px; }
 }

@@ -1,5 +1,14 @@
 <div class="stage">
 
+  <div class="invite" id="invite" hidden>
+    <p><strong>Everything here is free.</strong> Sign up with an email whenever you like and the practice room stays unlocked on this device. Nothing is charged and no card details are ever requested.</p>
+    <div class="invite-actions">
+      <button class="btn btn-primary btn-sm" id="inviteGo">Unlock it now</button>
+      <button class="pill" id="inviteLater">Not just now</button>
+    </div>
+  </div>
+
+
   <div class="stage-head">
     <div>
       <h1 id="pieceTitle">Twinkle, Twinkle, Little Star</h1>
@@ -139,29 +148,5 @@
         </p>
       </div>
     </aside>
-  </div>
-</div>
-
-<!-- signup gate -->
-<div class="gate" id="gate" hidden>
-  <div class="gate-card" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
-    <p class="eyebrow">You have had three sessions</p>
-    <h2 id="gateTitle">Keep going, for nothing</h2>
-    <p><strong>Signing up is 100% free. There is no payment and no card details are ever taken.</strong> It lets us tell you when new pieces, tools and lessons are added, and it is the only thing we ask for in return for the whole practice room.</p>
-    <div class="gate-form">
-      <label class="sr-only" for="gateEmail">Your email address</label>
-      <input type="email" id="gateEmail" placeholder="you@example.com" autocomplete="email" inputmode="email">
-      <button class="btn btn-primary" id="gateSubmit">Unlock the practice room</button>
-    </div>
-    <div class="hp" aria-hidden="true">
-      <label>Leave this empty<input type="text" id="gateWebsite" tabindex="-1" autocomplete="off"></label>
-    </div>
-    <p class="gate-msg" id="gateMsg"></p>
-    <p class="score-note">We send a one-click confirmation link, so nothing happens until you click it in your inbox. You can unsubscribe from any email and ask us to delete your address at any time. See the <a href="/privacy.html">privacy page</a>.</p>
-    <p class="score-note">Already signed up? Enter the same email to unlock this device.</p>
-    <div class="gate-alt">
-      <a class="pill" href="/piano-keys-for-beginners.html">Use the free beginner lesson instead</a>
-      <a class="pill" href="/tools.html">Use the free tools instead</a>
-    </div>
   </div>
 </div>

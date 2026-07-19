@@ -76,6 +76,8 @@
   ];
 
   var idx = 0, progress = 0;
+  var saved = LPK.load();
+  if (!saved.lessonDone && saved.lessonStep && saved.lessonStep < STEPS.length) idx = saved.lessonStep;
 
   function labelKeys(hint) {
     kb.keys.forEach(function (elKey, midi) {
@@ -268,9 +270,14 @@
   }
 
   document.getElementById('lessonRestart').addEventListener('click', function () {
+    var st = LPK.load(); st.lessonDone = false; st.lessonStep = 0; LPK.save(st);
     idx = 0; card.hidden = false; dots.hidden = false; doneBox.hidden = true; render();
     window.scrollTo({ top: card.offsetTop - 90, behavior: 'smooth' });
   });
 
   render();
+  if (idx > 0) {
+    elFb.textContent = 'Carried on from where you stopped last time.';
+    elFb.className = 'step-feedback';
+  }
 })();

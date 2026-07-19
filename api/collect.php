@@ -48,11 +48,13 @@ try {
                 VALUES (?, ?, 0, ?, ?, ?)')
      ->execute([$email, $tok, $source, gmdate('c'), lpk_ip_hash()]);
 
-  $link = LPK_SITE . '/api/verify.php?t=' . $tok;
+  $link  = LPK_SITE . '/api/verify.php?t=' . $tok;
+  $unsub = LPK_SITE . '/api/unsubscribe.php?e=' . rawurlencode($email) . '&t=' . $tok;
   $body = "Thanks for signing up to Learn Piano Keys.\n\n"
         . "Click this link to confirm your address:\n$link\n\n"
-        . "Signing up is free. No payment is taken and no card details are held.\n"
+        . "Signing up is free. Nothing is charged and no card details are held.\n"
         . "If you did not sign up, ignore this email and nothing further will happen.\n\n"
+        . "Unsubscribe at any time:\n$unsub\n\n"
         . "Learn Piano Keys\n" . LPK_SITE . "\n";
   lpk_send_mail($email, 'Confirm your Learn Piano Keys signup', $body);
 

@@ -29,6 +29,36 @@
     });
   }
 
+  /* ---- pick up where you left off ---- */
+  (function () {
+    var slot = document.getElementById('resume');
+    if (!slot || typeof LPK === 'undefined') return;
+    var s = LPK.load();
+    var names = { twinkle: 'Twinkle, Twinkle, Little Star', 'ode-to-joy': 'Ode to Joy', 'fur-elise': 'F\u00fcr Elise' };
+    var bits = [];
+    if (s.session && s.session.piece) {
+      bits.push('<a href="/app.html?piece=' + s.session.piece + '">Carry on with ' + (names[s.session.piece] || s.session.piece) + '</a>');
+    }
+    if (s.lessonDone) {
+      bits.push('<a href="/piano-keys-for-beginners.html">Run the first lesson again</a>');
+    } else if (s.lessonStep) {
+      bits.push('<a href="/piano-keys-for-beginners.html">Back to step ' + (s.lessonStep + 1) + ' of the first lesson</a>');
+    }
+    if (LPK.streak()) bits.push('<span>' + LPK.streak() + ' day' + (LPK.streak() === 1 ? '' : 's') + ' in a row</span>');
+    if (!bits.length) return;
+    slot.innerHTML = '<span class="resume-tag">Where you were</span>' + bits.join('<span class="sep">/</span>');
+    slot.hidden = false;
+  })();
+
+  /* ---- lesson progress on the beginner path card ---- */
+  (function () {
+    var tag = document.getElementById('pathProgress');
+    if (!tag || typeof LPK === 'undefined') return;
+    var s = LPK.load();
+    if (s.lessonDone) { tag.textContent = 'Completed'; tag.hidden = false; }
+    else if (s.lessonStep) { tag.textContent = 'Step ' + (s.lessonStep + 1) + ' of 6'; tag.hidden = false; }
+  })();
+
   /* ---- playable keyboards on content pages ---- */
   if (typeof PianoAudio === 'undefined') return;
   var audio = new PianoAudio();

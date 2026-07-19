@@ -6,9 +6,28 @@
 const fs = require('fs');
 const path = require('path');
 
-const ASSET_V = '3';
+const ASSET_V = '5';
 const SITE = 'https://learnpianokeys.com';
 const BRAND = 'Learn Piano Keys';
+
+/* IndexNow. One key, shared by Bing, Yandex, Seznam, Naver and Yep: submit
+   once and every participating engine is told. Google does not take part,
+   so Google is handled through Search Console and the sitemap.
+   Do not change this key once live: the key file at the root must match. */
+const INDEXNOW_KEY = '79e2624f7b502947f1147e5f7b9c8dd2';
+
+/* Search engine ownership verification. Paste the value each webmaster tool
+   gives you. Empty entries emit no tag at all, so there are never any
+   dangling meta tags on the page. */
+const VERIFY = {
+  'google-site-verification': '',   // Google Search Console
+  'msvalidate.01':            '',   // Bing Webmaster Tools
+  'yandex-verification':      '',   // Yandex Webmaster
+  'naver-site-verification':  '',   // Naver Search Advisor
+  'baidu-site-verification':  '',   // Baidu Ziyuan
+  'seznam-wmt':               '',   // Seznam Webmaster
+  'p:domain_verify':          ''    // Pinterest
+};
 const ROOT = path.join(__dirname, '..');
 
 const PAGES = [
@@ -17,7 +36,7 @@ const PAGES = [
     url: '/',
     title: 'Learn Piano Keys · Free piano lessons, tools and practice room',
     desc: 'Learn the piano keys from scratch, then practise real pieces with wait mode, looping, hand separation, fingering and a grand staff. Works with a MIDI keyboard, a microphone or your computer keys.',
-    scripts: ['engine', 'site', 'tracker'],
+    scripts: ['engine', 'gate', 'site', 'tracker'],
     crumbs: []
   },
   {
@@ -25,7 +44,7 @@ const PAGES = [
     url: '/piano-keys-for-beginners.html',
     title: 'Piano Keys for Beginners · Your first five minutes at the keyboard',
     desc: 'Never touched a piano? Six short steps, one octave, no jargon. Find middle C, name the white keys, put five fingers down and play your first real tune in about five minutes.',
-    scripts: ['engine', 'site', 'lesson'],
+    scripts: ['engine', 'gate', 'site', 'lesson'],
     crumbs: [['Lessons', '/#paths'], ['Piano keys for beginners', '/piano-keys-for-beginners.html']]
   },
   {
@@ -33,15 +52,15 @@ const PAGES = [
     url: '/tools.html',
     title: 'Free Piano Tools · Chord finder, scale explorer, metronome and note quiz',
     desc: 'Four practice tools that run entirely in your browser. Find any chord, see any scale on the keyboard, keep time with a tap-tempo metronome and test how fast you can name a key.',
-    scripts: ['engine', 'site', 'tools'],
+    scripts: ['engine', 'gate', 'site', 'tools'],
     crumbs: [['Tools', '/tools.html']]
   },
   {
     slug: 'practice',
     url: '/practice.html',
     title: 'Practice Tracker · Time your sessions and build a streak',
-    desc: 'A practice timer and streak tracker that keeps everything in your own browser. No account, no email, no upload.',
-    scripts: ['engine', 'site', 'tracker'],
+    desc: 'A practice timer and streak tracker that keeps everything in your own browser rather than on a server. Nothing to install and nothing uploaded.',
+    scripts: ['engine', 'gate', 'site', 'tracker'],
     crumbs: [['Practice tracker', '/practice.html']]
   },
   {
@@ -49,20 +68,23 @@ const PAGES = [
     url: '/app.html',
     title: 'Practice room · Learn Piano Keys',
     desc: 'Practise real pieces with wait mode, section looping, hand separation, tempo, transpose, count-in, sustain pedal and a grand staff.',
-    scripts: ['pieces', 'engine', 'site', 'share', 'gate', 'app'],
+    scripts: ['pieces', 'engine', 'gate', 'site', 'share', 'app'],
     crumbs: [['Practice room', '/app.html']],
     noindex: true,
     wide: true
   },
+  { slug: '404', url: '/404.html', title: 'Page not found · Learn Piano Keys',
+    desc: 'That page does not exist. Here is the way back to the lessons, the tools and the practice room.',
+    scripts: ['engine', 'gate', 'site'], crumbs: [], noindex: true, narrow: true },
   { slug: 'privacy', url: '/privacy.html', title: 'Privacy · Learn Piano Keys',
     desc: 'What Learn Piano Keys does and does not collect. Your playing never leaves your device.',
-    scripts: ['site'], crumbs: [['Privacy', '/privacy.html']], narrow: true },
+    scripts: ['engine', 'gate', 'site'], crumbs: [['Privacy', '/privacy.html']], narrow: true },
   { slug: 'terms', url: '/terms.html', title: 'Terms of use · Learn Piano Keys',
     desc: 'Terms of use for Learn Piano Keys, a free browser piano practice tool.',
-    scripts: ['site'], crumbs: [['Terms', '/terms.html']], narrow: true },
+    scripts: ['engine', 'gate', 'site'], crumbs: [['Terms', '/terms.html']], narrow: true },
   { slug: 'contact', url: '/contact.html', title: 'Contact · Learn Piano Keys',
     desc: 'Contact Learn Piano Keys about a bug, a piece you would like added, or anything else.',
-    scripts: ['site'], crumbs: [['Contact', '/contact.html']], narrow: true }
+    scripts: ['engine', 'gate', 'site'], crumbs: [['Contact', '/contact.html']], narrow: true }
 ];
 
 const FAVICONS = `  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -76,6 +98,13 @@ const FAVICONS = `  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 const FONTS = `  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">`;
+
+function verifyTags() {
+  return Object.keys(VERIFY)
+    .filter(k => VERIFY[k])
+    .map(k => `  <meta name="${k}" content="${VERIFY[k]}">\n`)
+    .join('');
+}
 
 function nav(active) {
   const items = [
@@ -149,7 +178,7 @@ function shell(p, body, extraSchema) {
   <meta name="twitter:title" content="${p.title}">
   <meta name="twitter:description" content="${p.desc}">
   <meta name="twitter:image" content="${SITE}/og-image.png">
-${FAVICONS}
+${verifyTags()}${FAVICONS}
 ${FONTS}
   <link rel="stylesheet" href="/assets/styles.css?v=${ASSET_V}">
   <script>(function(){try{var t=localStorage.getItem('lpk.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
@@ -165,7 +194,16 @@ ${FONTS}
     <nav class="nav" id="nav" aria-label="Main">
 ${nav(p.slug)}
       <button class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark">Light</button>
-      <a class="btn btn-primary btn-sm" href="/app.html">Practice room</a>
+      <button class="pill signin" id="signInBtn" hidden>Sign in</button>
+      <div class="acct" id="acct" hidden>
+        <button class="acct-btn" id="acctBtn" aria-expanded="false" aria-haspopup="true" aria-label="Your account"><span id="acctInitial">P</span></button>
+        <div class="acct-menu" id="acctMenu" hidden>
+          <p class="acct-email" id="acctEmail"></p>
+          <p class="acct-state">Unlocked, free</p>
+          <button class="pill" id="acctOut">Sign out</button>
+        </div>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app.html">Practice room</a>
     </nav>
   </div>
 </header>
@@ -209,6 +247,31 @@ ${body}
     </p>
   </div>
 </footer>
+
+
+<div class="gate" id="gate" hidden>
+  <div class="gate-card" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <button class="gate-close" id="gateClose" aria-label="Close" hidden>&times;</button>
+    <p class="eyebrow" id="gateKicker">Free, and it stays free</p>
+    <h2 id="gateTitle">Unlock everything with an email</h2>
+    <p id="gateBlurb"><strong>Signing up is 100% free. Nothing is charged and no card details are ever requested.</strong> It lets us tell you when new pieces, lessons and tools are added, and it keeps the practice room open on this device.</p>
+    <div class="gate-form">
+      <label class="sr-only" for="gateEmail">Your email address</label>
+      <input type="email" id="gateEmail" placeholder="you@example.com" autocomplete="email" inputmode="email">
+      <button class="btn btn-primary" id="gateSubmit">Unlock everything</button>
+    </div>
+    <div class="hp" aria-hidden="true">
+      <label>Leave this empty<input type="text" id="gateWebsite" tabindex="-1" autocomplete="off"></label>
+    </div>
+    <p class="gate-msg" id="gateMsg"></p>
+    <p class="score-note">We send a one-click confirmation link, so nothing happens until you click it in your inbox. Every email has an unsubscribe link and you can ask us to delete your address at any time. See the <a href="/privacy.html">privacy page</a>.</p>
+    <p class="score-note">Already signed up? Enter the same email to unlock this device.</p>
+    <div class="gate-alt" id="gateAlt">
+      <a class="pill" href="/piano-keys-for-beginners.html">Use the free beginner lesson instead</a>
+      <a class="pill" href="/tools.html">Use the free tools instead</a>
+    </div>
+  </div>
+</div>
 
 <div class="hint" id="hint"></div>
 <div id="sr" class="sr-only" role="status" aria-live="polite"></div>
@@ -266,10 +329,46 @@ PAGES.forEach(p => {
 
 /* sitemap from the same list, so it can never disagree with the pages */
 const urls = PAGES.filter(p => !p.noindex)
-  .map(p => `  <url><loc>${SITE}${p.url}</loc><priority>${p.url === '/' ? '1.0' : '0.7'}</priority></url>`)
+  .map(p => `  <url><loc>${SITE}${p.url}</loc><lastmod>${new Date().toISOString().slice(0, 10)}</lastmod></url>`)
   .join('\n');
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
+
+fs.writeFileSync(path.join(ROOT, INDEXNOW_KEY + '.txt'), INDEXNOW_KEY);
+
+fs.writeFileSync(path.join(ROOT, 'robots.txt'),
+`# Everything on this site is open to every crawler.
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /app.html
+
+# Named explicitly so nothing here is ever mistaken for a block.
+User-agent: Googlebot
+Allow: /
+User-agent: Bingbot
+Allow: /
+User-agent: Slurp
+Allow: /
+User-agent: DuckDuckBot
+Allow: /
+User-agent: YandexBot
+Allow: /
+User-agent: Baiduspider
+Allow: /
+User-agent: Yeti
+Allow: /
+User-agent: SeznamBot
+Allow: /
+User-agent: Applebot
+Allow: /
+User-agent: facebookexternalhit
+Allow: /
+User-agent: Twitterbot
+Allow: /
+
+Sitemap: ${SITE}/sitemap.xml
+`);
 
 fs.writeFileSync(path.join(ROOT, 'site.webmanifest'), JSON.stringify({
   name: BRAND, short_name: 'Piano Keys', start_url: '/', display: 'standalone',
@@ -281,3 +380,4 @@ fs.writeFileSync(path.join(ROOT, 'site.webmanifest'), JSON.stringify({
 }, null, 2));
 
 console.log(`built ${count} pages at asset version ${ASSET_V}`);
+console.log(`sitemap, robots.txt, manifest and the IndexNow key file are regenerated with them`);

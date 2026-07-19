@@ -38,6 +38,15 @@
       }
     }
 
+    var lp = document.getElementById('lessonProgress');
+    if (lp) {
+      lp.textContent = s.lessonDone
+        ? 'First lesson completed.'
+        : (s.lessonStep ? 'First lesson: step ' + (s.lessonStep + 1) + ' of 6.' : 'First lesson not started.');
+    }
+    var qb = document.getElementById('quizBestOut');
+    if (qb) qb.textContent = s.quizBest ? s.quizBest + ' in a row' : 'not played yet';
+
     var list = document.getElementById('bestList');
     if (list) {
       var best = s.best || {};

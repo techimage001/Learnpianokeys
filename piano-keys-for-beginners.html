@@ -31,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/styles.css?v=3">
+  <link rel="stylesheet" href="/assets/styles.css?v=5">
   <script>(function(){try{var t=localStorage.getItem('lpk.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
@@ -49,7 +49,16 @@
       <a href="/practice.html">Practice</a>
       <a href="/#compare">What is free</a>
       <button class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark">Light</button>
-      <a class="btn btn-primary btn-sm" href="/app.html">Practice room</a>
+      <button class="pill signin" id="signInBtn" hidden>Sign in</button>
+      <div class="acct" id="acct" hidden>
+        <button class="acct-btn" id="acctBtn" aria-expanded="false" aria-haspopup="true" aria-label="Your account"><span id="acctInitial">P</span></button>
+        <div class="acct-menu" id="acctMenu" hidden>
+          <p class="acct-email" id="acctEmail"></p>
+          <p class="acct-state">Unlocked, free</p>
+          <button class="pill" id="acctOut">Sign out</button>
+        </div>
+      </div>
+      <a class="btn btn-primary btn-sm nav-cta" href="/app.html">Practice room</a>
     </nav>
   </div>
 </header>
@@ -173,12 +182,38 @@
   </div>
 </footer>
 
+
+<div class="gate" id="gate" hidden>
+  <div class="gate-card" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <button class="gate-close" id="gateClose" aria-label="Close" hidden>&times;</button>
+    <p class="eyebrow" id="gateKicker">Free, and it stays free</p>
+    <h2 id="gateTitle">Unlock everything with an email</h2>
+    <p id="gateBlurb"><strong>Signing up is 100% free. Nothing is charged and no card details are ever requested.</strong> It lets us tell you when new pieces, lessons and tools are added, and it keeps the practice room open on this device.</p>
+    <div class="gate-form">
+      <label class="sr-only" for="gateEmail">Your email address</label>
+      <input type="email" id="gateEmail" placeholder="you@example.com" autocomplete="email" inputmode="email">
+      <button class="btn btn-primary" id="gateSubmit">Unlock everything</button>
+    </div>
+    <div class="hp" aria-hidden="true">
+      <label>Leave this empty<input type="text" id="gateWebsite" tabindex="-1" autocomplete="off"></label>
+    </div>
+    <p class="gate-msg" id="gateMsg"></p>
+    <p class="score-note">We send a one-click confirmation link, so nothing happens until you click it in your inbox. Every email has an unsubscribe link and you can ask us to delete your address at any time. See the <a href="/privacy.html">privacy page</a>.</p>
+    <p class="score-note">Already signed up? Enter the same email to unlock this device.</p>
+    <div class="gate-alt" id="gateAlt">
+      <a class="pill" href="/piano-keys-for-beginners.html">Use the free beginner lesson instead</a>
+      <a class="pill" href="/tools.html">Use the free tools instead</a>
+    </div>
+  </div>
+</div>
+
 <div class="hint" id="hint"></div>
 <div id="sr" class="sr-only" role="status" aria-live="polite"></div>
 
-<script src="/assets/engine.js?v=3"></script>
-<script src="/assets/site.js?v=3"></script>
-<script src="/assets/lesson.js?v=3"></script>
+<script src="/assets/engine.js?v=5"></script>
+<script src="/assets/gate.js?v=5"></script>
+<script src="/assets/site.js?v=5"></script>
+<script src="/assets/lesson.js?v=5"></script>
 
 <script type="application/ld+json">
 {

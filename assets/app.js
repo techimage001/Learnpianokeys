@@ -58,7 +58,18 @@ function boot() {
   window.addEventListener('resize', sizeCanvases);
   sizeCanvases();
 
-  loadPiece();
+  const resumed = restoreSession();
+  loadPiece(true);
+  if (resumed) {
+    flashHint('Picked up where you left off. Press Restart to go back to the beginning.');
+    say('Resumed from bar ' + (barOf(S.cursor) + 1));
+  }
+  reflectControls();
+  bindInvite();
+  maybeInvite();
+  setInterval(saveSession, 5000);
+  addEventListener('pagehide', saveSession);
+  addEventListener('beforeunload', saveSession);
   requestAnimationFrame(frame);
 }
 
@@ -83,17 +94,18 @@ function buildPieceMenu() {
   sel.addEventListener('change', () => {
     S.piece = PIECES.find(p => p.id === sel.value);
     S.bpm = S.piece.bpm;
-    loadPiece();
+    loadPiece(false);
+    reflectControls();
+    saveSession();
   });
 }
 
-function loadPiece() {
+function loadPiece(keepSession) {
   stop();
   S.cursor = pickup() - 4;
   S.results.clear();
-  S.loop = null;
   S.take = [];
-  S.transpose = 0;
+  if (!keepSession) { S.transpose = 0; S.loop = null; }
   S.session = { notes: 0, hit: 0, timing: 0, literacyNotes: 0, literacyHit: 0 };
   el('pieceTitle').textContent = S.piece.title;
   el('pieceMeta').textContent = `${S.piece.composer} · ${S.piece.origin} · ${S.piece.keyName} · ${S.piece.meter.join('/')}`;
@@ -426,8 +438,11 @@ function startUnit() { return S.loop ? S.loop[0] : pickup(); }
 let sessionCounted = false;
 function start() {
   if (typeof LPKGate !== 'undefined') {
-    if (LPKGate.shouldBlock()) { LPKGate.open(() => { sessionCounted = false; start(); }); return; }
-    if (!sessionCounted) { sessionCounted = true; LPKGate.countSession(); }
+    if (LPKGate.shouldBlock()) {
+      LPKGate.open('wall', () => { sessionCounted = false; start(); });
+      return;
+    }
+    if (!sessionCounted) { sessionCounted = true; LPKGate.countSession(); maybeInvite(); }
   }
   audio.resume();
   if (S.cursor < startUnit() - S.piece.barUnits * 2.5 || S.cursor >= (S.loop ? S.loop[1] : S.piece.totalUnits)) {
@@ -458,7 +473,7 @@ function stop() {
   if (kb) kb.keys.forEach(k => k.classList.remove('on', 'lh', 'rh'));
   const b = el('playBtn');
   if (b) { b.textContent = 'Play'; b.classList.remove('is-playing'); }
-  if (wasPlaying) { recordBest(); renderTrouble(); say('Paused'); }
+  if (wasPlaying) { recordBest(); renderTrouble(); saveSession(); say('Paused'); }
 }
 
 function restart() {
@@ -557,6 +572,94 @@ function pulse(accent) {
   if (accent) p.classList.add('accent');
   clearTimeout(pulseT);
   pulseT = setTimeout(() => p.classList.remove('beat', 'accent'), 180);
+}
+
+/* An invitation, never a countdown. It leads with what signing up gives,
+   and it can be waved away without losing anything. */
+function maybeInvite() {
+  const box = el('invite');
+  if (!box || typeof LPKGate === 'undefined') return;
+  if (LPKGate.unlocked()) { box.hidden = true; return; }
+  const s = LPK.load();
+  if (s.inviteDismissed) return;
+  if (LPKGate.remaining() > 1) return;
+  box.hidden = false;
+}
+
+function bindInvite() {
+  const box = el('invite');
+  if (!box) return;
+  el('inviteGo').addEventListener('click', () => {
+    LPKGate.open('wall', () => { box.hidden = true; });
+  });
+  el('inviteLater').addEventListener('click', () => {
+    const s = LPK.load(); s.inviteDismissed = true; LPK.save(s);
+    box.hidden = true;
+  });
+}
+
+/* ---------------- session state, so practice resumes where it stopped ---------------- */
+function saveSession() {
+  const s = LPK.load();
+  s.session = {
+    piece: S.piece.id,
+    cursor: Math.max(pickup(), Math.floor(S.cursor)),
+    bpm: S.bpm,
+    hand: S.hand,
+    transpose: S.transpose,
+    loop: S.loop,
+    wait: S.wait, read: S.read, countIn: S.countIn, metronome: S.metronome,
+    fingers: S.showFingers, names: S.showNames, accompany: S.accompany,
+    at: Date.now()
+  };
+  LPK.save(s);
+}
+
+function restoreSession() {
+  const saved = (LPK.load().session) || null;
+  if (!saved || saved.piece !== S.piece.id) return false;
+  S.bpm = saved.bpm || S.bpm;
+  S.hand = saved.hand || 'both';
+  S.transpose = saved.transpose || 0;
+  S.loop = saved.loop || null;
+  ['wait', 'read', 'countIn', 'metronome', 'accompany'].forEach(k => {
+    if (typeof saved[k] === 'boolean') S[k] = saved[k];
+  });
+  if (typeof saved.fingers === 'boolean') S.showFingers = saved.fingers;
+  if (typeof saved.names === 'boolean') S.showNames = saved.names;
+  const end = S.piece.totalUnits;
+  if (typeof saved.cursor === 'number' && saved.cursor > pickup() + 2 && saved.cursor < end - 2) {
+    S.cursor = saved.cursor;
+    return true;
+  }
+  return false;
+}
+
+function reflectControls() {
+  el('bpm').value = S.bpm;
+  el('bpmOut').textContent = S.bpm;
+  updateTransposeUI();
+  document.querySelectorAll('[data-hand]').forEach(b => {
+    const on = b.dataset.hand === S.hand;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+  const map = { waitMode: S.wait, readMode: S.read, countMode: S.countIn, metroMode: S.metronome,
+                fingerMode: S.showFingers, nameMode: S.showNames, accompMode: S.accompany };
+  Object.keys(map).forEach(id => {
+    const b = el(id);
+    if (!b) return;
+    b.classList.toggle('active', !!map[id]);
+    b.setAttribute('aria-pressed', String(!!map[id]));
+  });
+  el('keys').classList.toggle('hide-names', !S.showNames);
+  el('readCard').classList.toggle('lit', S.read);
+  if (S.loop) {
+    el('loopOut').textContent = S.loop[0] < pickup()
+      ? 'from pick-up'
+      : `bars ${barOf(S.loop[0]) + 1}\u2013${barOf(S.loop[1] - 0.001) + 1}`;
+  }
+  paintBarStrip();
 }
 
 /* ---------------- hear your take ---------------- */
@@ -994,6 +1097,7 @@ function bindControls() {
     LPK.clear();
     practiceMarked = false;
     sessionCounted = false;
+    if (typeof LPKGate !== 'undefined') LPKGate.paintAccount();
     renderProgress();
     flashHint('Saved progress cleared');
   });
