@@ -606,3 +606,48 @@ kbd {
   .acct-menu { right: auto; left: 0; }
   .invite { padding: 14px 16px; }
 }
+
+/* ---- v6: the step by step guide, and no blank panels ---- */
+
+.howto {
+  background: var(--ink-2); border: 1px solid var(--brass-dim);
+  border-radius: 14px; padding: 20px 22px; margin-bottom: 18px;
+}
+.howto-head { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+.howto-head h2 {
+  font-family: var(--body); font-size: 1.05rem; font-weight: 600;
+  letter-spacing: 0; margin: 0; flex: 1 1 auto; color: var(--ivory);
+}
+.howto-head .pill { padding: 5px 12px; font-size: .78rem; }
+.howto-lede { font-size: .92rem; color: var(--ivory-2); margin: 10px 0 16px; }
+.howto-steps { margin: 0 0 16px; padding: 0; list-style: none; counter-reset: howto; }
+.howto-steps li {
+  position: relative; padding: 0 0 14px 42px; counter-increment: howto;
+  font-size: .93rem; color: var(--ivory-2); line-height: 1.55;
+}
+.howto-steps li::before {
+  content: counter(howto);
+  position: absolute; left: 0; top: 0;
+  width: 27px; height: 27px; border-radius: 50%;
+  background: var(--brass); color: var(--brass-ink);
+  font-family: var(--mono); font-size: .8rem; font-weight: 600;
+  display: grid; place-items: center;
+}
+.howto-steps li b { color: var(--ivory); font-weight: 600; }
+.howto-foot { font-size: .84rem; color: var(--ivory-3); margin: 0 0 16px; }
+#howtoBody[hidden] { display: none; }
+
+@media (max-width: 860px) {
+  .howto { padding: 16px; }
+  .howto-steps li { padding-left: 36px; font-size: .9rem; }
+  .howto-steps li::before { width: 24px; height: 24px; font-size: .74rem; }
+  .stage { padding: 14px 14px 32px; }
+  #roll { height: 200px; }
+  #staff { height: 132px; }
+  .keybed.in-app { height: 118px; }
+  .transport { gap: 10px; padding: 14px; }
+  .transport .tempo { flex: 1 1 100%; }
+  .transport input[type=range] { flex: 1 1 auto; width: auto; }
+  .stage-head h1 { font-size: 1.45rem; }
+  .invite { flex-direction: column; align-items: flex-start; }
+}

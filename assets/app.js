@@ -3,6 +3,68 @@
 const audio = new PianoAudio();
 let detector = null;
 
+/* ---------------- state ---------------- */
+const S = {
+  piece: PIECES[0],
+  bpm: 88,
+  hand: 'both',        // both | r | l
+  wait: true,
+  read: false,         // notation only, falling notes hidden
+  showFingers: true,
+  showNames: true,
+  metronome: false,
+  accompany: true,     // play the hand you are not practising
+  countIn: true,
+  transpose: 0,
+  mic: false,
+  playing: false,
+  cursor: 0,           // position in units (float)
+  loop: null,          // [startUnit, endUnit] or null
+  lastTs: 0,
+  held: new Set(),
+  results: new Map(),  // note index -> { hit, dt }
+  session: { notes: 0, hit: 0, timing: 0, literacyNotes: 0, literacyHit: 0 },
+  waitingAt: null,
+  stuck: null,         // { at, amount } hesitation while wait mode holds
+  lastClickBeat: null,
+  countInUntil: null,
+  take: [],
+  takePlaying: false
+};
+
+/* The keyboard shrinks on small screens rather than being squeezed:
+   a 49 key range at 390px is unusable, two octaves is fine. */
+function keyRange() {
+  const w = window.innerWidth || 1024;
+  if (w < 560) return [55, 79];    // G3 to G5
+  if (w < 900) return [48, 84];    // C3 to C6
+  return [36, 84];                 // C2 to C6
+}
+let LOW = 36, HIGH = 84;
+const LOOKAHEAD = 20;               // units visible on the roll
+const HIT_WINDOW = 0.55;            // in units, for rhythm grading
+const CATCH = 2.5;                  // in units, how far a note counts as "this one"
+
+let kb, rollCv, rollCx, staffCv, staffCx;
+
+/* ---------------- helpers ---------------- */
+const el = id => document.getElementById(id);
+const unitSec = () => 60 / S.bpm / 4;
+const tm = n => n.m + S.transpose;
+const activeNotes = () => S.piece.notes.filter(n => S.hand === 'both' || n.h === S.hand);
+const pickup = () => S.piece.pickup || 0;
+const barCount = () => Math.ceil((S.piece.totalUnits - pickup()) / S.piece.barUnits);
+const barStart = b => pickup() + b * S.piece.barUnits;
+const barOf = u => Math.floor(Math.max(0, u - pickup()) / S.piece.barUnits);
+
+function diatonic(midi) {
+  const map = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
+  const pc = ((midi % 12) + 12) % 12;
+  return (Math.floor(midi / 12) - 1) * 7 + map[pc];
+}
+const needsSharp = midi => [1, 3, 6, 8, 10].includes(((midi % 12) + 12) % 12);
+const say = msg => { const r = el('sr'); if (r) r.textContent = msg; };
+
 /* ---------------- persistence (shared LPK store) ---------------- */
 let practiceMarked = false;
 function markPractice() {
@@ -47,6 +109,7 @@ function boot() {
   S.bpm = S.piece.bpm;
 
   buildPieceMenu();
+  const r = keyRange(); LOW = r[0]; HIGH = r[1];
   kb = buildKeybed(el('keys'), LOW, HIGH, { labels: true, markC: true });
   bindKeybed();
   bindControls();
@@ -55,7 +118,15 @@ function boot() {
 
   rollCv = el('roll'); rollCx = rollCv.getContext('2d');
   staffCv = el('staff'); staffCx = staffCv.getContext('2d');
-  window.addEventListener('resize', sizeCanvases);
+  window.addEventListener('resize', () => {
+    const r2 = keyRange();
+    if (r2[0] !== LOW || r2[1] !== HIGH) {
+      LOW = r2[0]; HIGH = r2[1];
+      kb = buildKeybed(el('keys'), LOW, HIGH, { labels: true, markC: true });
+      el('keys').classList.toggle('hide-names', !S.showNames);
+    }
+    sizeCanvases();
+  });
   sizeCanvases();
 
   const resumed = restoreSession();
@@ -65,6 +136,7 @@ function boot() {
     say('Resumed from bar ' + (barOf(S.cursor) + 1));
   }
   reflectControls();
+  bindHowto();
   bindInvite();
   maybeInvite();
   setInterval(saveSession, 5000);
@@ -586,6 +658,34 @@ function maybeInvite() {
   box.hidden = false;
 }
 
+function bindHowto() {
+  const box = el('howto');
+  if (!box) return;
+  const body = el('howtoBody');
+  const toggle = el('howtoToggle');
+  const store = LPK.load();
+  const collapsed = !!store.howtoSeen;
+
+  function setOpen(open) {
+    body.hidden = !open;
+    toggle.textContent = open ? 'Hide' : 'Show';
+    toggle.setAttribute('aria-expanded', String(open));
+    box.classList.toggle('is-open', open);
+  }
+  setOpen(!collapsed);
+
+  toggle.addEventListener('click', () => setOpen(body.hidden));
+  el('howtoDone').addEventListener('click', () => {
+    const st = LPK.load(); st.howtoSeen = true; LPK.save(st);
+    setOpen(false);
+    flashHint('It is under How this works whenever you want it back.');
+  });
+  el('howtoOpen').addEventListener('click', () => {
+    setOpen(true);
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
 function bindInvite() {
   const box = el('invite');
   if (!box) return;
@@ -736,6 +836,17 @@ function drawRoll() {
     rollCx.textAlign = 'center';
     rollCx.fillText('READ MODE · notes hidden, play from the staff', w / 2, h / 2);
     return;
+  }
+
+  /* An idle panel should never be a blank black rectangle. */
+  if (!S.playing) {
+    rollCx.textAlign = 'center';
+    rollCx.fillStyle = 'rgba(212,163,67,.85)';
+    rollCx.font = '600 15px "Instrument Sans", system-ui, sans-serif';
+    rollCx.fillText('Press Play to begin', w / 2, 34);
+    rollCx.fillStyle = 'rgba(167,154,140,.7)';
+    rollCx.font = '12px "IBM Plex Mono", monospace';
+    rollCx.fillText('blocks fall to the keys below · rose is your right hand, blue your left', w / 2, 56);
   }
 
   const px = h / LOOKAHEAD;
@@ -894,6 +1005,7 @@ function paintSystem(c, o) {
 function drawStaff() {
   const w = staffCv.clientWidth, h = staffCv.clientHeight;
   staffCx.clearRect(0, 0, w, h);
+  if (!w || !h) return;
   const bu = S.piece.barUnits;
   const barIdx = Math.max(0, barOf(S.cursor));
   const from = barStart(barIdx);

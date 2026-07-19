@@ -253,6 +253,14 @@ fs.readdirSync(path.join(ROOT, 'api')).forEach(f => {
 ok(/No advertising/.test(docs['privacy.html']), 'privacy page states there is no advertising');
 ok(!/serve and measure adverts/i.test(docs['privacy.html']), 'privacy page no longer describes ad serving');
 
+/* ---- 9f. first-timer guidance in the tool ---- */
+head('first-timer guidance');
+ok(appHtml.includes('id="howto"'), 'practice room has a step by step guide');
+ok((appHtml.match(/<li><b>/g) || []).length >= 6, 'the guide has at least six numbered steps');
+ok(appHtml.includes('id="howtoOpen"'), 'the guide can be reopened after dismissal');
+ok(/piano-keys-for-beginners\.html/.test(appHtml), 'the guide points absolute beginners somewhere gentler');
+ok(/Press Play to begin/.test(appJs), 'the falling-note panel is never a blank rectangle when idle');
+
 /* ---- 10. sitemap ---- */
 head('sitemap');
 const sm = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');

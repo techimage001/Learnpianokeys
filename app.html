@@ -31,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/styles.css?v=5">
+  <link rel="stylesheet" href="/assets/styles.css?v=6">
   <script>(function(){try{var t=localStorage.getItem('lpk.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body class="wide">
@@ -66,6 +66,26 @@
 <nav class="crumbs" aria-label="Breadcrumb"><div class="wrap"><a href="/">Home</a><span class="sep">/</span><span aria-current="page">Practice room</span></div></nav>
 <main id="main">
 <div class="stage">
+
+  <section class="howto" id="howto" aria-labelledby="howtoTitle">
+    <div class="howto-head">
+      <h2 id="howtoTitle">How the practice room works</h2>
+      <button class="pill" id="howtoToggle" aria-expanded="true" aria-controls="howtoBody">Hide</button>
+    </div>
+    <div id="howtoBody">
+      <p class="howto-lede">Six things, and then you can leave this panel alone. If you have never touched a piano, do the <a href="/piano-keys-for-beginners.html">five minute walkthrough</a> first: it is gentler than this page.</p>
+      <ol class="howto-steps">
+        <li><b>Pick a piece.</b> Use the dropdown at the top right. Twinkle, Twinkle is the easiest. Start there if you are unsure.</li>
+        <li><b>Press Play.</b> You get two bars of clicks to count you in, then the coloured blocks start falling towards the keyboard at the bottom.</li>
+        <li><b>Play a block when it lands on the strike line.</b> Rose blocks are your right hand, blue are your left. The small number on each block is the finger to use.</li>
+        <li><b>Nothing runs away from you.</b> Wait mode is on, so the music stops and waits until you play the right note. Drag the Tempo slider down if it still feels fast.</li>
+        <li><b>Loop the hard bit.</b> Tap any numbered bar in the Loop a section panel and it repeats until you leave it. Trouble spots also lists the bars you keep fluffing, with a one-tap loop.</li>
+        <li><b>Watch three scores, not one.</b> Right notes, in time, and reading. Read mode hides the falling blocks and leaves the stave, and only what you play then counts towards reading.</li>
+      </ol>
+      <p class="howto-foot">No keyboard? Tap the on-screen keys, or use your computer's <kbd>A</kbd> to <kbd>K</kbd> row. A MIDI keyboard plugged in by USB works straight away.</p>
+      <button class="btn btn-primary btn-sm" id="howtoDone">Got it, let me play</button>
+    </div>
+  </section>
 
   <div class="invite" id="invite" hidden>
     <p><strong>Everything here is free.</strong> Sign up with an email whenever you like and the practice room stays unlocked on this device. Nothing is charged and no card details are ever requested.</p>
@@ -109,6 +129,7 @@
       <div class="transport">
         <button class="btn btn-primary btn-sm" id="playBtn">Play</button>
         <button class="btn btn-ghost btn-sm" id="restartBtn">Restart</button>
+        <button class="pill" id="howtoOpen">How this works</button>
         <div class="tempo">
           <label for="bpm">Tempo</label>
           <input type="range" id="bpm" min="30" max="160" value="88">
@@ -284,12 +305,12 @@
 <div class="hint" id="hint"></div>
 <div id="sr" class="sr-only" role="status" aria-live="polite"></div>
 
-<script src="/assets/pieces.js?v=5"></script>
-<script src="/assets/engine.js?v=5"></script>
-<script src="/assets/gate.js?v=5"></script>
-<script src="/assets/site.js?v=5"></script>
-<script src="/assets/share.js?v=5"></script>
-<script src="/assets/app.js?v=5"></script>
+<script src="/assets/pieces.js?v=6"></script>
+<script src="/assets/engine.js?v=6"></script>
+<script src="/assets/gate.js?v=6"></script>
+<script src="/assets/site.js?v=6"></script>
+<script src="/assets/share.js?v=6"></script>
+<script src="/assets/app.js?v=6"></script>
 
 <script type="application/ld+json">
 {

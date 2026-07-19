@@ -6,7 +6,19 @@ frameworks, no paid APIs, no sampled audio.
 ## Build
 
     node tools/build.js      # regenerates every .html from src/ + sitemap + manifest
-    node tools/tests.js      # 623 assertions across every page family
+    node tools/tests.js      # static assertions across every page family
+    node tools/smoke.js      # BOOTS every page in a DOM and clicks every control
+
+Run all three before every release. `tests.js` reads the files; `smoke.js`
+executes them.
+
+**Why smoke.js exists.** `node --check` validates syntax only. A refactor once
+deleted the practice room's entire state object and every helper function in
+one slice, the syntax check passed, the static tests passed, and the page was
+completely dead in a real browser for two releases. Only running the code
+catches that. `smoke.js` loads each page in jsdom, evaluates every script in
+one shared scope exactly as a browser does, asserts the app actually built
+itself, and clicks every button on every page.
 
 Never hand-edit the .html files at the repo root. They are generated.
 Edit `src/*.html` for body content and `tools/build.js` for head, nav and footer.
