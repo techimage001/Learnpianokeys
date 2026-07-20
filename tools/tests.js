@@ -40,6 +40,60 @@ pages.forEach(p => {
   ok(/name="robots"/.test(s), `${p}: robots directive`);
 });
 
+/* ---- 1b. complete metadata, on every page ---- */
+head('complete metadata');
+pages.forEach(p => {
+  const s2 = docs[p];
+  ok(/property="og:image:alt" content=".{20,}"/.test(s2), `${p}: og:image has alt text`);
+  ok(/name="twitter:image:alt"/.test(s2), `${p}: twitter image has alt text`);
+  ok(/property="og:image:type"/.test(s2), `${p}: og:image type declared`);
+  ok(/name="author" content="Learn Piano Keys"/.test(s2), `${p}: author`);
+  ok(/rel="alternate" hreflang="en-gb"/.test(s2), `${p}: self-referencing hreflang`);
+  ok(/hreflang="x-default"/.test(s2), `${p}: x-default hreflang`);
+  ok(/name="mobile-web-app-capable"/.test(s2), `${p}: web app capable`);
+
+  // each page must carry its OWN social card, not a shared one
+  const og = (s2.match(/property="og:image" content="https:\/\/learnpianokeys\.com\/([^"]+)"/) || [])[1];
+  ok(!!og && og !== 'og-image.png', `${p}: has its own social card (${og})`);
+  ok(og && fs.existsSync(path.join(ROOT, og)), `${p}: that social card file exists`);
+
+  const block = (s2.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/) || [])[1];
+  const graph = JSON.parse(block)['@graph'];
+  const wp = graph.find(x => x['@type'] === 'WebPage');
+  ok(!!wp, `${p}: WebPage node`);
+  if (wp) {
+    ok(!!wp.datePublished && /^\d{4}-\d{2}-\d{2}$/.test(wp.datePublished), `${p}: datePublished`);
+    ok(!!wp.dateModified && /^\d{4}-\d{2}-\d{2}$/.test(wp.dateModified), `${p}: dateModified`);
+    ok(wp.isAccessibleForFree === true, `${p}: declared free to use`);
+    ok(!!wp.primaryImageOfPage && wp.primaryImageOfPage.caption, `${p}: primary image with a caption`);
+    ok(!!wp.isPartOf, `${p}: tied to the WebSite`);
+    ok(!!wp.author && !!wp.publisher, `${p}: author and publisher`);
+    ok(wp.inLanguage === 'en-GB', `${p}: language declared on the page node`);
+    if ((docs[p].match(/class="crumbs"/) || []).length) {
+      ok(!!wp.breadcrumb, `${p}: WebPage points at its breadcrumb trail`);
+    }
+  }
+  const faq = graph.find(x => x['@type'] === 'FAQPage');
+  if (faq) {
+    ok(!!faq.author && !!faq.publisher, `${p}: FAQ carries author and publisher`);
+    ok(faq.isAccessibleForFree === true, `${p}: FAQ declared free`);
+    ok(!!faq.mainEntityOfPage, `${p}: FAQ bound to the page node`);
+  }
+});
+{
+  const rg = JSON.parse((docs['how-to-read-music.html']
+    .match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/) || [])[1])['@graph'];
+  const howto = rg.find(x => x['@type'] === 'HowTo');
+  ok(!!howto.image, 'HowTo carries an image');
+  ok(howto.isAccessibleForFree === true, 'HowTo declared free');
+  ok(!!howto.estimatedCost && howto.estimatedCost.value === '0', 'HowTo cost stated as zero');
+  const lr = rg.find(x => x['@type'] === 'LearningResource');
+  ok(!!lr, 'LearningResource node on the reading page');
+  ok(lr && lr.teaches.length >= 6, `LearningResource lists what it teaches (${lr ? lr.teaches.length : 0} items)`);
+  const wp = rg.find(x => x['@type'] === 'WebPage');
+  ok(!!wp.speakable, 'reading page marks its answer paragraphs as speakable');
+}
+
 /* ---- 2. favicon set on every page family ---- */
 head('favicons');
 ['favicon.svg', 'favicon-48.png', 'favicon-96.png', 'favicon-192.png', 'favicon.ico', 'apple-touch-icon.png', 'site.webmanifest']

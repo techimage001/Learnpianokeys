@@ -13,14 +13,23 @@
   <meta property="og:title" content="How to Read Music Notes · Free interactive lessons and note trainer">
   <meta property="og:description" content="Learn to read the treble and bass clef with playable diagrams, then practise with a free note trainer that shows a note and waits for you to play it. Works with a MIDI keyboard, mouse or computer keys.">
   <meta property="og:url" content="https://learnpianokeys.com/how-to-read-music.html">
-  <meta property="og:image" content="https://learnpianokeys.com/og-image.png">
+  <meta property="og:image" content="https://learnpianokeys.com/og-how-to-read-music.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:alt" content="How to read music: the treble and bass clef explained with playable diagrams">
   <meta property="og:locale" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="How to Read Music Notes · Free interactive lessons and note trainer">
   <meta name="twitter:description" content="Learn to read the treble and bass clef with playable diagrams, then practise with a free note trainer that shows a note and waits for you to play it. Works with a MIDI keyboard, mouse or computer keys.">
-  <meta name="twitter:image" content="https://learnpianokeys.com/og-image.png">
+  <meta name="twitter:image" content="https://learnpianokeys.com/og-how-to-read-music.png">
+  <meta name="twitter:image:alt" content="How to read music: the treble and bass clef explained with playable diagrams">
+  <meta name="author" content="Learn Piano Keys">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Piano Keys">
+  <link rel="alternate" hreflang="en-gb" href="https://learnpianokeys.com/how-to-read-music.html">
+  <link rel="alternate" hreflang="x-default" href="https://learnpianokeys.com/how-to-read-music.html">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png">
@@ -31,7 +40,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/styles.css?v=9">
+  <link rel="stylesheet" href="/assets/styles.css?v=10">
   <script>(function(){try{var t=localStorage.getItem('lpk.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
@@ -358,10 +367,10 @@
 <div class="hint" id="hint"></div>
 <div id="sr" class="sr-only" role="status" aria-live="polite"></div>
 
-<script src="/assets/engine.js?v=9"></script>
-<script src="/assets/gate.js?v=9"></script>
-<script src="/assets/site.js?v=9"></script>
-<script src="/assets/reading.js?v=9"></script>
+<script src="/assets/engine.js?v=10"></script>
+<script src="/assets/gate.js?v=10"></script>
+<script src="/assets/site.js?v=10"></script>
+<script src="/assets/reading.js?v=10"></script>
 
 <script type="application/ld+json">
 {
@@ -372,8 +381,14 @@
       "@id": "https://learnpianokeys.com/#org",
       "name": "Learn Piano Keys",
       "url": "https://learnpianokeys.com/",
-      "logo": "https://learnpianokeys.com/favicon-512.png",
-      "email": "info@learnpianokeys.com"
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://learnpianokeys.com/favicon-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "email": "info@learnpianokeys.com",
+      "description": "Free piano lessons, practice tools and a browser practice room. No advertising."
     },
     {
       "@type": "WebSite",
@@ -386,7 +401,48 @@
       "inLanguage": "en-GB"
     },
     {
+      "@type": "WebPage",
+      "@id": "https://learnpianokeys.com/how-to-read-music.html#webpage",
+      "url": "https://learnpianokeys.com/how-to-read-music.html",
+      "name": "How to Read Music Notes · Free interactive lessons and note trainer",
+      "description": "Learn to read the treble and bass clef with playable diagrams, then practise with a free note trainer that shows a note and waits for you to play it. Works with a MIDI keyboard, mouse or computer keys.",
+      "isPartOf": {
+        "@id": "https://learnpianokeys.com/#website"
+      },
+      "about": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "inLanguage": "en-GB",
+      "datePublished": "2026-07-19",
+      "dateModified": "2026-07-20",
+      "isAccessibleForFree": true,
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://learnpianokeys.com/og-how-to-read-music.png",
+        "width": 1200,
+        "height": 630,
+        "caption": "How to read music: the treble and bass clef explained with playable diagrams"
+      },
+      "author": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "publisher": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "breadcrumb": {
+        "@id": "https://learnpianokeys.com/how-to-read-music.html#breadcrumb"
+      },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "h1",
+          ".answer-first"
+        ]
+      }
+    },
+    {
       "@type": "BreadcrumbList",
+      "@id": "https://learnpianokeys.com/how-to-read-music.html#breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
@@ -405,6 +461,17 @@
     {
       "@type": "FAQPage",
       "@id": "https://learnpianokeys.com/how-to-read-music.html#faq",
+      "mainEntityOfPage": {
+        "@id": "https://learnpianokeys.com/how-to-read-music.html#webpage"
+      },
+      "inLanguage": "en-GB",
+      "isAccessibleForFree": true,
+      "author": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "publisher": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
       "mainEntity": [
         {
           "@type": "Question",
@@ -462,6 +529,28 @@
       "name": "How to read music notes on the piano",
       "description": "Learn the stave, the treble clef, the bass clef, ledger lines and note lengths, then practise reading with an interactive note trainer.",
       "totalTime": "PT10M",
+      "image": {
+        "@type": "ImageObject",
+        "url": "https://learnpianokeys.com/og-how-to-read-music.png",
+        "width": 1200,
+        "height": 630
+      },
+      "estimatedCost": {
+        "@type": "MonetaryAmount",
+        "currency": "GBP",
+        "value": "0"
+      },
+      "isAccessibleForFree": true,
+      "inLanguage": "en-GB",
+      "mainEntityOfPage": {
+        "@id": "https://learnpianokeys.com/how-to-read-music.html#webpage"
+      },
+      "author": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "publisher": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
       "supply": [
         {
           "@type": "HowToSupply",
@@ -512,6 +601,41 @@
           "url": "https://learnpianokeys.com/how-to-read-music.html#trainer"
         }
       ]
+    },
+    {
+      "@type": "LearningResource",
+      "@id": "https://learnpianokeys.com/how-to-read-music.html#lesson",
+      "name": "How to read music notes on the piano",
+      "url": "https://learnpianokeys.com/how-to-read-music.html",
+      "description": "An interactive guide to reading the stave, with playable diagrams and a note trainer that waits for you to play the note you see.",
+      "learningResourceType": [
+        "Interactive lesson",
+        "Practice tool"
+      ],
+      "educationalLevel": "Beginner",
+      "educationalUse": "Self study",
+      "teaches": [
+        "The stave and the grand stave",
+        "Finding middle C",
+        "Treble clef lines and spaces",
+        "Bass clef lines and spaces",
+        "Ledger lines",
+        "Sharps, flats and naturals",
+        "Note lengths and time signatures"
+      ],
+      "timeRequired": "PT10M",
+      "isAccessibleForFree": true,
+      "inLanguage": "en-GB",
+      "audience": {
+        "@type": "EducationalAudience",
+        "educationalRole": "student"
+      },
+      "provider": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "mainEntityOfPage": {
+        "@id": "https://learnpianokeys.com/how-to-read-music.html#webpage"
+      }
     }
   ]
 }

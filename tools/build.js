@@ -6,8 +6,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const ASSET_V = '9';
+const ASSET_V = '10';
 const SITE = 'https://learnpianokeys.com';
+const AUTHOR = 'Learn Piano Keys';
+const BUILT = new Date().toISOString().slice(0, 10);
 const BRAND = 'Learn Piano Keys';
 
 /* IndexNow. One key, shared by Bing, Yandex, Seznam, Naver and Yep: submit
@@ -34,6 +36,8 @@ const PAGES = [
   {
     slug: 'index',
     url: '/',
+    published: '2026-07-18',
+    ogAlt: 'Learn Piano Keys: a free browser piano practice room, shown with a piano keybed',
     title: 'Learn Piano Keys · Free piano lessons, tools and practice room',
     desc: 'Learn the piano keys from scratch, then practise real pieces with wait mode, looping, hand separation, fingering and a grand staff. Works with a MIDI keyboard, a microphone or your computer keys.',
     scripts: ['engine', 'gate', 'site', 'tracker'],
@@ -42,6 +46,8 @@ const PAGES = [
   {
     slug: 'piano-keys-for-beginners',
     url: '/piano-keys-for-beginners.html',
+    published: '2026-07-19',
+    ogAlt: 'Your first five minutes at the piano: a six step beginner walkthrough',
     title: 'Piano Keys for Beginners · Your first five minutes at the keyboard',
     desc: 'Never touched a piano? Six short steps, one octave, no jargon. Find middle C, name the white keys, put five fingers down and play your first real tune in about five minutes.',
     scripts: ['engine', 'gate', 'site', 'lesson'],
@@ -50,14 +56,19 @@ const PAGES = [
   {
     slug: 'how-to-read-music',
     url: '/how-to-read-music.html',
+    published: '2026-07-19',
+    ogAlt: 'How to read music: the treble and bass clef explained with playable diagrams',
     title: 'How to Read Music Notes · Free interactive lessons and note trainer',
     desc: 'Learn to read the treble and bass clef with playable diagrams, then practise with a free note trainer that shows a note and waits for you to play it. Works with a MIDI keyboard, mouse or computer keys.',
     scripts: ['engine', 'gate', 'site', 'reading'],
+    speakable: true,
     crumbs: [['How to read music', '/how-to-read-music.html']]
   },
   {
     slug: 'tools',
     url: '/tools.html',
+    published: '2026-07-19',
+    ogAlt: 'Free piano tools: chord finder, scale explorer, metronome and note quiz',
     title: 'Free Piano Tools · Chord finder, scale explorer, metronome and note quiz',
     desc: 'Four practice tools that run entirely in your browser. Find any chord, see any scale on the keyboard, keep time with a tap-tempo metronome and test how fast you can name a key.',
     scripts: ['engine', 'gate', 'site', 'tools'],
@@ -66,6 +77,8 @@ const PAGES = [
   {
     slug: 'practice',
     url: '/practice.html',
+    published: '2026-07-19',
+    ogAlt: 'Practice tracker: a timer and streak kept in your own browser',
     title: 'Practice Tracker · Time your sessions and build a streak',
     desc: 'A practice timer and streak tracker that keeps everything in your own browser rather than on a server. Nothing to install and nothing uploaded.',
     scripts: ['engine', 'gate', 'site', 'tracker'],
@@ -74,6 +87,8 @@ const PAGES = [
   {
     slug: 'app',
     url: '/app.html',
+    published: '2026-07-18',
+    ogAlt: 'The Learn Piano Keys practice room, with falling notes above a piano keybed',
     title: 'Practice room · Learn Piano Keys',
     desc: 'Practise real pieces with wait mode, section looping, hand separation, tempo, transpose, count-in, sustain pedal and a grand staff.',
     scripts: ['pieces', 'engine', 'gate', 'site', 'share', 'app'],
@@ -81,16 +96,20 @@ const PAGES = [
     noindex: true,
     wide: true
   },
-  { slug: '404', url: '/404.html', title: 'Page not found · Learn Piano Keys',
+  { slug: '404', url: '/404.html', published: '2026-07-19',
+    ogAlt: 'Page not found on Learn Piano Keys', title: 'Page not found · Learn Piano Keys',
     desc: 'That page does not exist. Here is the way back to the lessons, the tools and the practice room.',
     scripts: ['engine', 'gate', 'site'], crumbs: [], noindex: true, narrow: true },
-  { slug: 'privacy', url: '/privacy.html', title: 'Privacy · Learn Piano Keys',
+  { slug: 'privacy', url: '/privacy.html', published: '2026-07-18',
+    ogAlt: 'Privacy at Learn Piano Keys: no advertising and nothing uploaded', title: 'Privacy · Learn Piano Keys',
     desc: 'What Learn Piano Keys does and does not collect. Your playing never leaves your device.',
     scripts: ['engine', 'gate', 'site'], crumbs: [['Privacy', '/privacy.html']], narrow: true },
-  { slug: 'terms', url: '/terms.html', title: 'Terms of use · Learn Piano Keys',
+  { slug: 'terms', url: '/terms.html', published: '2026-07-18',
+    ogAlt: 'Terms of use for Learn Piano Keys', title: 'Terms of use · Learn Piano Keys',
     desc: 'Terms of use for Learn Piano Keys, a free browser piano practice tool.',
     scripts: ['engine', 'gate', 'site'], crumbs: [['Terms', '/terms.html']], narrow: true },
-  { slug: 'contact', url: '/contact.html', title: 'Contact · Learn Piano Keys',
+  { slug: 'contact', url: '/contact.html', published: '2026-07-18',
+    ogAlt: 'Contact Learn Piano Keys', title: 'Contact · Learn Piano Keys',
     desc: 'Contact Learn Piano Keys about a bug, a piece you would like added, or anything else.',
     scripts: ['engine', 'gate', 'site'], crumbs: [['Contact', '/contact.html']], narrow: true }
 ];
@@ -106,6 +125,10 @@ const FAVICONS = `  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 const FONTS = `  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">`;
+
+function ogImage(p) {
+  return 'og-' + (p.slug === 'index' ? 'index' : p.slug) + '.png';
+}
 
 function verifyTags() {
   return Object.keys(VERIFY)
@@ -140,20 +163,45 @@ function breadcrumbSchema(crumbs, url) {
   if (!crumbs.length) return null;
   const list = [{ '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' }];
   crumbs.forEach((c, i) => list.push({ '@type': 'ListItem', position: i + 2, name: c[0], item: SITE + c[1] }));
-  return { '@type': 'BreadcrumbList', itemListElement: list };
+  return { '@type': 'BreadcrumbList', '@id': SITE + url + '#breadcrumb', itemListElement: list };
 }
 
-function siteSchema() {
+function siteSchema(p) {
   return [
     { '@type': 'Organization', '@id': SITE + '/#org', name: BRAND, url: SITE + '/',
-      logo: SITE + '/favicon-512.png', email: 'info@learnpianokeys.com' },
+      logo: { '@type': 'ImageObject', url: SITE + '/favicon-512.png', width: 512, height: 512 },
+      email: 'info@learnpianokeys.com',
+      description: 'Free piano lessons, practice tools and a browser practice room. No advertising.' },
     { '@type': 'WebSite', '@id': SITE + '/#website', url: SITE + '/', name: BRAND,
-      publisher: { '@id': SITE + '/#org' }, inLanguage: 'en-GB' }
+      publisher: { '@id': SITE + '/#org' }, inLanguage: 'en-GB' },
+    {
+      '@type': 'WebPage',
+      '@id': SITE + p.url + '#webpage',
+      url: SITE + p.url,
+      name: p.title,
+      description: p.desc,
+      isPartOf: { '@id': SITE + '/#website' },
+      about: { '@id': SITE + '/#org' },
+      inLanguage: 'en-GB',
+      datePublished: p.published,
+      dateModified: BUILT,
+      isAccessibleForFree: true,
+      primaryImageOfPage: {
+        '@type': 'ImageObject',
+        url: SITE + '/' + ogImage(p),
+        width: 1200, height: 630,
+        caption: p.ogAlt
+      },
+      author: { '@id': SITE + '/#org' },
+      publisher: { '@id': SITE + '/#org' },
+      ...(p.crumbs.length ? { breadcrumb: { '@id': SITE + p.url + '#breadcrumb' } } : {}),
+      ...(p.speakable ? { speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1', '.answer-first'] } } : {})
+    }
   ];
 }
 
 function shell(p, body, extraSchema) {
-  const graph = siteSchema();
+  const graph = siteSchema(p);
   const bc = breadcrumbSchema(p.crumbs, p.url);
   if (bc) graph.push(bc);
   (extraSchema || []).forEach(s => graph.push(s));
@@ -179,14 +227,23 @@ function shell(p, body, extraSchema) {
   <meta property="og:title" content="${p.title}">
   <meta property="og:description" content="${p.desc}">
   <meta property="og:url" content="${SITE}${p.url}">
-  <meta property="og:image" content="${SITE}/og-image.png">
+  <meta property="og:image" content="${SITE}/${ogImage(p)}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:alt" content="${p.ogAlt}">
   <meta property="og:locale" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${p.title}">
   <meta name="twitter:description" content="${p.desc}">
-  <meta name="twitter:image" content="${SITE}/og-image.png">
+  <meta name="twitter:image" content="${SITE}/${ogImage(p)}">
+  <meta name="twitter:image:alt" content="${p.ogAlt}">
+  <meta name="author" content="${AUTHOR}">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Piano Keys">
+  <link rel="alternate" hreflang="en-gb" href="${SITE}${p.url}">
+  <link rel="alternate" hreflang="x-default" href="${SITE}${p.url}">
 ${verifyTags()}${FAVICONS}
 ${FONTS}
   <link rel="stylesheet" href="/assets/styles.css?v=${ASSET_V}">
@@ -304,6 +361,11 @@ function faqSchema(body, url) {
   const strip = s => s.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
   return {
     '@type': 'FAQPage', '@id': SITE + url + '#faq',
+    mainEntityOfPage: { '@id': SITE + url + '#webpage' },
+    inLanguage: 'en-GB',
+    isAccessibleForFree: true,
+    author: { '@id': SITE + '/#org' },
+    publisher: { '@id': SITE + '/#org' },
     mainEntity: qs.map(m => ({
       '@type': 'Question', name: strip(m[1]),
       acceptedAnswer: { '@type': 'Answer', text: strip(m[2]) }
@@ -333,6 +395,13 @@ const READ_SCHEMA = {
   name: 'How to read music notes on the piano',
   description: 'Learn the stave, the treble clef, the bass clef, ledger lines and note lengths, then practise reading with an interactive note trainer.',
   totalTime: 'PT10M',
+  image: { '@type': 'ImageObject', url: SITE + '/og-how-to-read-music.png', width: 1200, height: 630 },
+  estimatedCost: { '@type': 'MonetaryAmount', currency: 'GBP', value: '0' },
+  isAccessibleForFree: true,
+  inLanguage: 'en-GB',
+  mainEntityOfPage: { '@id': SITE + '/how-to-read-music.html#webpage' },
+  author: { '@id': SITE + '/#org' },
+  publisher: { '@id': SITE + '/#org' },
   supply: [{ '@type': 'HowToSupply', name: 'A piano, digital keyboard, or the on-screen keyboard' }],
   tool: [{ '@type': 'HowToTool', name: 'Learn Piano Keys note trainer' }],
   step: [
@@ -357,6 +426,32 @@ const READ_SCHEMA = {
   ]
 };
 
+const LEARNING_SCHEMA = {
+  '@type': 'LearningResource',
+  '@id': SITE + '/how-to-read-music.html#lesson',
+  name: 'How to read music notes on the piano',
+  url: SITE + '/how-to-read-music.html',
+  description: 'An interactive guide to reading the stave, with playable diagrams and a note trainer that waits for you to play the note you see.',
+  learningResourceType: ['Interactive lesson', 'Practice tool'],
+  educationalLevel: 'Beginner',
+  educationalUse: 'Self study',
+  teaches: [
+    'The stave and the grand stave',
+    'Finding middle C',
+    'Treble clef lines and spaces',
+    'Bass clef lines and spaces',
+    'Ledger lines',
+    'Sharps, flats and naturals',
+    'Note lengths and time signatures'
+  ],
+  timeRequired: 'PT10M',
+  isAccessibleForFree: true,
+  inLanguage: 'en-GB',
+  audience: { '@type': 'EducationalAudience', educationalRole: 'student' },
+  provider: { '@id': SITE + '/#org' },
+  mainEntityOfPage: { '@id': SITE + '/how-to-read-music.html#webpage' }
+};
+
 let count = 0;
 PAGES.forEach(p => {
   const body = fs.readFileSync(path.join(ROOT, 'src', p.slug + '.html'), 'utf8');
@@ -364,7 +459,7 @@ PAGES.forEach(p => {
   const faq = faqSchema(body, p.url);
   if (faq) extra.push(faq);
   if (p.slug === 'index') extra.push(APP_SCHEMA);
-  if (p.slug === 'how-to-read-music') extra.push(READ_SCHEMA);
+  if (p.slug === 'how-to-read-music') { extra.push(READ_SCHEMA); extra.push(LEARNING_SCHEMA); }
   fs.writeFileSync(path.join(ROOT, p.slug + '.html'), shell(p, body, extra));
   count++;
 });
