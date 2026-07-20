@@ -11,6 +11,7 @@ const S = {
   wait: true,
   read: false,         // notation only, falling notes hidden
   showFingers: true,
+  showLetters: true,   // L / R on every block, for people who should not have to remember
   showNames: true,
   metronome: false,
   accompany: true,     // play the hand you are not practising
@@ -41,6 +42,10 @@ function keyRange() {
   return [36, 84];                 // C2 to C6
 }
 let LOW = 36, HIGH = 84;
+const HAND_L = '#6FB6DC';           // left hand, everywhere, always
+const HAND_R = '#D96E68';           // right hand, everywhere, always
+const GOOD   = '#7FA86F';           // played correctly, shown as an outline
+const FELT   = '#9E3B45';           // missed, shown as an outline
 const LOOKAHEAD = 20;               // units visible on the roll
 const HIT_WINDOW = 0.55;            // in units, for rhythm grading
 const CATCH = 2.5;                  // in units, how far a note counts as "this one"
@@ -440,14 +445,21 @@ function flashJudge(kind) {
   f._t = setTimeout(() => { f.className = 'judge'; f.textContent = ''; }, 700);
 }
 
+function setScore(id, value) {
+  const e = el(id);
+  if (!e) return;
+  e.textContent = value === null ? 'not yet' : value;
+  e.classList.toggle('empty', value === null);
+}
+
 function updateScores() {
   const n = S.session.notes;
   const acc = n ? Math.round(S.session.hit / n * 100) : 0;
   const tim = S.session.hit ? Math.round(S.session.timing / S.session.hit * 100) : 0;
   const lit = S.session.literacyNotes ? Math.round(S.session.literacyHit / S.session.literacyNotes * 100) : 0;
-  el('accVal').textContent = n ? acc + '%' : '·';
-  el('timVal').textContent = S.session.hit ? tim + '%' : '·';
-  el('litVal').textContent = S.session.literacyNotes ? lit + '%' : '·';
+  setScore('accVal', n ? acc + '%' : null);
+  setScore('timVal', S.session.hit ? tim + '%' : null);
+  setScore('litVal', S.session.literacyNotes ? lit + '%' : null);
   el('litCount').textContent = S.session.literacyNotes
     ? `${S.session.literacyNotes} notes read`
     : 'Turn on Read mode to build this';
@@ -542,7 +554,8 @@ function stop() {
   S.countInUntil = null;
   audio.allOff();
   S.held.clear();
-  if (kb) kb.keys.forEach(k => k.classList.remove('on', 'lh', 'rh'));
+  if (kb) kb.keys.forEach(k => k.classList.remove('on', 'lh', 'rh', 'target'));
+  litTargets = [];
   const b = el('playBtn');
   if (b) { b.textContent = 'Play'; b.classList.remove('is-playing'); }
   if (wasPlaying) { recordBest(); renderTrouble(); saveSession(); say('Paused'); }
@@ -630,6 +643,8 @@ function frame(ts) {
   drawRoll();
   drawStaff();
   paintBarStrip();
+  paintNextKeys();
+  updateCoach();
   el('waitBadge').style.opacity = S.waitingAt !== null ? '1' : '0';
   requestAnimationFrame(frame);
 }
@@ -709,7 +724,7 @@ function saveSession() {
     transpose: S.transpose,
     loop: S.loop,
     wait: S.wait, read: S.read, countIn: S.countIn, metronome: S.metronome,
-    fingers: S.showFingers, names: S.showNames, accompany: S.accompany,
+    fingers: S.showFingers, letters: S.showLetters, names: S.showNames, accompany: S.accompany,
     at: Date.now()
   };
   LPK.save(s);
@@ -726,6 +741,7 @@ function restoreSession() {
     if (typeof saved[k] === 'boolean') S[k] = saved[k];
   });
   if (typeof saved.fingers === 'boolean') S.showFingers = saved.fingers;
+  if (typeof saved.letters === 'boolean') S.showLetters = saved.letters;
   if (typeof saved.names === 'boolean') S.showNames = saved.names;
   const end = S.piece.totalUnits;
   if (typeof saved.cursor === 'number' && saved.cursor > pickup() + 2 && saved.cursor < end - 2) {
@@ -745,7 +761,8 @@ function reflectControls() {
     b.setAttribute('aria-pressed', String(on));
   });
   const map = { waitMode: S.wait, readMode: S.read, countMode: S.countIn, metroMode: S.metronome,
-                fingerMode: S.showFingers, nameMode: S.showNames, accompMode: S.accompany };
+                letterMode: S.showLetters, fingerMode: S.showFingers,
+                nameMode: S.showNames, accompMode: S.accompany };
   Object.keys(map).forEach(id => {
     const b = el(id);
     if (!b) return;
@@ -800,6 +817,60 @@ function playTake(withReference) {
     S.takePlaying = false;
     el('takeBadge').style.opacity = '0';
   }, last * unitSec() * 1000 + 700);
+}
+
+/* Show the learner the exact key to press, on the keyboard itself. */
+let litTargets = [];
+function paintNextKeys() {
+  const want = [];
+  if (S.playing && S.wait && S.waitingAt !== null) {
+    activeNotes().forEach(n => {
+      if (Math.abs(n.s - S.waitingAt) < 0.001 && !S.results.has(S.piece.notes.indexOf(n))) want.push(tm(n));
+    });
+  }
+  if (want.length === litTargets.length && want.every((m, i) => m === litTargets[i])) return;
+  litTargets.forEach(m => { const k = kb && kb.keys.get(m); if (k) k.classList.remove('target'); });
+  litTargets = want;
+  litTargets.forEach(m => { const k = kb && kb.keys.get(m); if (k) k.classList.add('target'); });
+}
+
+/* Plain English, always on screen, saying what to do right now. */
+const FINGER_NAMES = { 1: 'thumb', 2: 'index finger', 3: 'middle finger', 4: 'ring finger', 5: 'little finger' };
+let lastCoach = '';
+function updateCoach() {
+  const box = el('coach');
+  if (!box) return;
+  let msg;
+
+  if (S.takePlaying) {
+    msg = 'Listening back to what you just played.';
+  } else if (!S.playing) {
+    msg = S.cursor > pickup() + 2
+      ? 'Paused. Press Play to carry on, or Restart to go back to the beginning.'
+      : 'Press Play when you are ready. Nothing will run away from you.';
+  } else if (S.countInUntil !== null && S.cursor < S.countInUntil) {
+    msg = 'Counting you in. Get your hands on the keys.';
+  } else if (S.waitingAt !== null) {
+    const pending = activeNotes().filter(n =>
+      Math.abs(n.s - S.waitingAt) < 0.001 && !S.results.has(S.piece.notes.indexOf(n)));
+    if (pending.length === 1) {
+      const n = pending[0];
+      const hand = n.h === 'l' ? 'left' : 'right';
+      const finger = n.f ? ' with your ' + hand + ' ' + FINGER_NAMES[n.f] : ' with your ' + hand + ' hand';
+      msg = 'Waiting for you: play ' + pitchClass(tm(n)) + finger + '. It is glowing on the keyboard.';
+    } else if (pending.length > 1) {
+      msg = 'Waiting for you: play ' + pending.map(n => pitchClass(tm(n))).join(' and ') +
+            ' together. Both are glowing on the keyboard.';
+    } else {
+      msg = 'Keep going.';
+    }
+  } else if (S.read) {
+    msg = 'Read mode. The blocks are hidden, so play from the music above.';
+  } else {
+    msg = 'Follow the blocks down to the keys. Take your time.';
+  }
+
+  if (msg !== lastCoach) { box.textContent = msg; lastCoach = msg; }
 }
 
 /* ---------------- falling note roll ---------------- */
@@ -862,22 +933,37 @@ function drawRoll() {
     const top = y - nh;
     const res = S.results.get(i);
 
-    let fill = n.h === 'l' ? '#6FA3C0' : '#C9605C';
-    if (!isActive) fill = 'rgba(167,154,140,.22)';
-    else if (res && res.hit) fill = '#7FA86F';
-    else if (res && !res.hit) fill = 'rgba(158,59,69,.55)';
-
-    rollCx.fillStyle = fill;
-    rollCx.globalAlpha = isActive ? (rel < 0 ? 0.5 : 1) : 1;
+    /* Hue always means the hand, never the outcome. Colouring a missed
+       left-hand note red made it look like a right-hand note, which broke
+       the one piece of information the colours are there to carry. */
+    const handColour = n.h === 'l' ? HAND_L : HAND_R;
+    rollCx.fillStyle = isActive ? handColour : 'rgba(167,154,140,.22)';
+    rollCx.globalAlpha = !isActive ? 1
+      : res && !res.hit ? 0.4
+      : rel < 0 ? 0.5 : 1;
     roundRect(rollCx, x - bw / 2, top, bw, nh, 4);
     rollCx.fill();
 
-    if (S.showFingers && isActive && n.f && nh > 16 && rel < LOOKAHEAD - 1) {
+    if (isActive && res) {
       rollCx.globalAlpha = 1;
-      rollCx.fillStyle = '#14100F';
-      rollCx.font = '600 11px "IBM Plex Mono", monospace';
+      rollCx.lineWidth = 2;
+      rollCx.strokeStyle = res.hit ? GOOD : FELT;
+      roundRect(rollCx, x - bw / 2 + 1, top + 1, bw - 2, nh - 2, 4);
+      rollCx.stroke();
+    }
+
+    if (isActive && rel < LOOKAHEAD - 1) {
+      rollCx.globalAlpha = 1;
+      rollCx.fillStyle = 'rgba(20,16,15,.92)';
       rollCx.textAlign = 'center';
-      rollCx.fillText(n.f, x, top + nh - 6);
+      if (S.showLetters && nh > 14) {
+        rollCx.font = '700 11px "IBM Plex Mono", monospace';
+        rollCx.fillText(n.h === 'l' ? 'L' : 'R', x, top + 13);
+      }
+      if (S.showFingers && n.f && nh > (S.showLetters ? 30 : 16)) {
+        rollCx.font = '700 11px "IBM Plex Mono", monospace';
+        rollCx.fillText(n.f, x, top + nh - 6);
+      }
     }
     rollCx.globalAlpha = 1;
   });
@@ -962,17 +1048,17 @@ function paintSystem(c, o) {
 
     const colour = o.light ? '#14100F'
       : !isActive ? 'rgba(167,154,140,.3)'
-      : res && res.hit ? '#7FA86F'
-      : res && !res.hit ? '#9E3B45'
-      : (n.h === 'l' ? '#6FA3C0' : '#C9605C');
+      : (n.h === 'l' ? HAND_L : HAND_R);
 
     c.save();
+    c.globalAlpha = (res && !res.hit && !o.light) ? 0.45 : 1;
     c.translate(x, y); c.rotate(-0.32);
     c.beginPath();
     c.ellipse(0, 0, gap * 0.6, gap * 0.44, 0, 0, Math.PI * 2);
     c.fillStyle = colour; c.strokeStyle = colour; c.lineWidth = 1.6;
     if (n.d >= S.piece.barUnits * 1.2) c.stroke(); else c.fill();
     c.restore();
+    c.globalAlpha = 1;
 
     c.strokeStyle = colour; c.lineWidth = 1.4;
     const up = y > base - 2 * gap;
@@ -980,6 +1066,14 @@ function paintSystem(c, o) {
     c.moveTo(x + (up ? gap * 0.55 : -gap * 0.55), y);
     c.lineTo(x + (up ? gap * 0.55 : -gap * 0.55), y + (up ? -gap * 2.7 : gap * 2.7));
     c.stroke();
+
+    if (res && !o.light) {
+      c.globalAlpha = 1;
+      c.fillStyle = res.hit ? GOOD : FELT;
+      c.beginPath();
+      c.arc(x, base - 5.6 * gap, 2.4, 0, Math.PI * 2);
+      c.fill();
+    }
 
     if (needsSharp(midi)) {
       c.fillStyle = o.light ? '#14100F' : (isActive ? 'rgba(244,237,226,.85)' : 'rgba(167,154,140,.35)');
@@ -1177,6 +1271,7 @@ function bindControls() {
   const toggles = [
     ['waitMode', v => S.wait = v, () => S.wait],
     ['readMode', v => { S.read = v; el('readCard').classList.toggle('lit', v); }, () => S.read],
+    ['letterMode', v => S.showLetters = v, () => S.showLetters],
     ['fingerMode', v => S.showFingers = v, () => S.showFingers],
     ['nameMode', v => { S.showNames = v; el('keys').classList.toggle('hide-names', !v); }, () => S.showNames],
     ['metroMode', v => S.metronome = v, () => S.metronome],

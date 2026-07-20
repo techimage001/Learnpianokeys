@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ASSET_V = '6';
+const ASSET_V = '8';
 const SITE = 'https://learnpianokeys.com';
 const BRAND = 'Learn Piano Keys';
 

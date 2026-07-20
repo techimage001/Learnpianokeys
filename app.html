@@ -31,7 +31,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/styles.css?v=6">
+  <link rel="stylesheet" href="/assets/styles.css?v=8">
   <script>(function(){try{var t=localStorage.getItem('lpk.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body class="wide">
@@ -77,7 +77,7 @@
       <ol class="howto-steps">
         <li><b>Pick a piece.</b> Use the dropdown at the top right. Twinkle, Twinkle is the easiest. Start there if you are unsure.</li>
         <li><b>Press Play.</b> You get two bars of clicks to count you in, then the coloured blocks start falling towards the keyboard at the bottom.</li>
-        <li><b>Play a block when it lands on the strike line.</b> Rose blocks are your right hand, blue are your left. The small number on each block is the finger to use.</li>
+        <li><b>Play a block when it lands on the strike line.</b> The colour tells you which hand: <span class="ink-l">blue for your left hand</span>, <span class="ink-r">rose for your right</span>. That never changes, whatever you play. The small number on each block is the finger to use, with 1 as the thumb. A green outline appears once you have played a block in time, and a red one if it went past you.</li>
         <li><b>Nothing runs away from you.</b> Wait mode is on, so the music stops and waits until you play the right note. Drag the Tempo slider down if it still feels fast.</li>
         <li><b>Loop the hard bit.</b> Tap any numbered bar in the Loop a section panel and it repeats until you leave it. Trouble spots also lists the bars you keep fluffing, with a one-tap loop.</li>
         <li><b>Watch three scores, not one.</b> Right notes, in time, and reading. Read mode hides the falling blocks and leaves the stave, and only what you play then counts towards reading.</li>
@@ -121,6 +121,13 @@
           <div class="take-badge" id="takeBadge">your take</div>
           <div class="pulse" id="pulse" aria-hidden="true"></div>
         </div>
+        <p class="coach" id="coach">Press Play when you are ready.</p>
+        <div class="hand-legend" aria-hidden="false">
+          <span class="legend-item"><i class="sw sw-l"></i>Left hand</span>
+          <span class="legend-item"><i class="sw sw-r"></i>Right hand</span>
+          <span class="legend-item"><i class="sw sw-hit"></i>Played in time</span>
+          <span class="legend-item"><i class="sw sw-miss"></i>Missed</span>
+        </div>
         <div class="keybed in-app">
           <div class="keys" id="keys" role="group" aria-label="Piano keyboard. Play using your computer keys, a MIDI keyboard, or by clicking the keys."></div>
         </div>
@@ -158,16 +165,25 @@
           <button class="pill" id="readMode" aria-pressed="false">Read mode</button>
           <button class="pill" id="countMode" aria-pressed="true">Count in</button>
           <button class="pill" id="metroMode" aria-pressed="false">Metronome</button>
+          <button class="pill" id="letterMode" aria-pressed="true">Hand letters</button>
           <button class="pill" id="fingerMode" aria-pressed="true">Fingering</button>
           <button class="pill" id="nameMode" aria-pressed="true">Note names</button>
           <button class="pill" id="accompMode" aria-pressed="true">Play other hand</button>
           <button class="pill" id="pedalMode" aria-pressed="false">Sustain pedal</button>
           <button class="pill" id="micMode" aria-pressed="false">Use microphone</button>
         </div>
-        <p class="score-note" style="margin-top:14px">
-          Hold <kbd>Shift</kbd> for the pedal, or use a real one: the app reads sustain from your MIDI keyboard.
-          The microphone option is for acoustic pianos and follows one note at a time, so it is less accurate than MIDI.
-        </p>
+        <dl class="tool-glossary">
+          <div><dt>Wait mode</dt><dd>The music stops and waits until you play the right note. Leave this on until you can keep up.</dd></div>
+          <div><dt>Read mode</dt><dd>Hides the falling blocks so you play from the written music instead. Harder. Only this counts towards your reading score.</dd></div>
+          <div><dt>Count in</dt><dd>Two bars of clicks before the music starts, so you are not caught out.</dd></div>
+          <div><dt>Metronome</dt><dd>A click on every beat while you play, to keep you steady.</dd></div>
+          <div><dt>Hand letters</dt><dd>Puts an L or an R on every block so you never have to remember which colour is which hand.</dd></div>
+          <div><dt>Fingering</dt><dd>Puts a number on every block: 1 is your thumb, 5 is your little finger.</dd></div>
+          <div><dt>Note names</dt><dd>Prints C, D, E and so on along the keys.</dd></div>
+          <div><dt>Play other hand</dt><dd>When you practise one hand, the app plays the other one for you.</dd></div>
+          <div><dt>Sustain pedal</dt><dd>Holds the notes ringing. Hold <kbd>Shift</kbd>, or use the real pedal on your MIDI keyboard.</dd></div>
+          <div><dt>Use microphone</dt><dd>For an acoustic piano with no cable. It follows one note at a time, so it is less accurate than plugging in.</dd></div>
+        </dl>
       </div>
 
       <div class="pcard" style="margin-top:16px">
@@ -305,12 +321,12 @@
 <div class="hint" id="hint"></div>
 <div id="sr" class="sr-only" role="status" aria-live="polite"></div>
 
-<script src="/assets/pieces.js?v=6"></script>
-<script src="/assets/engine.js?v=6"></script>
-<script src="/assets/gate.js?v=6"></script>
-<script src="/assets/site.js?v=6"></script>
-<script src="/assets/share.js?v=6"></script>
-<script src="/assets/app.js?v=6"></script>
+<script src="/assets/pieces.js?v=8"></script>
+<script src="/assets/engine.js?v=8"></script>
+<script src="/assets/gate.js?v=8"></script>
+<script src="/assets/site.js?v=8"></script>
+<script src="/assets/share.js?v=8"></script>
+<script src="/assets/app.js?v=8"></script>
 
 <script type="application/ld+json">
 {

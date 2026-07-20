@@ -261,6 +261,46 @@ ok(appHtml.includes('id="howtoOpen"'), 'the guide can be reopened after dismissa
 ok(/piano-keys-for-beginners\.html/.test(appHtml), 'the guide points absolute beginners somewhere gentler');
 ok(/Press Play to begin/.test(appJs), 'the falling-note panel is never a blank rectangle when idle');
 
+/* ---- 9g. hand colour must mean hand, and only hand ---- */
+head('hand colour coding');
+ok(/const HAND_L = '#[0-9A-Fa-f]{6}'/.test(appJs), 'left hand colour defined once');
+ok(/const HAND_R = '#[0-9A-Fa-f]{6}'/.test(appJs), 'right hand colour defined once');
+{
+  // the status colours must never be assigned as a note's fill
+  const badFill = /fill\s*=\s*'#7FA86F'|fill\s*=\s*'rgba\(158,\s*59,\s*69/;
+  ok(!badFill.test(appJs), 'a hit or a miss never repaints a note in the status colour');
+  ok(/strokeStyle = res\.hit \? GOOD : FELT/.test(appJs), 'status is drawn as an outline instead');
+  const handL = (appJs.match(/const HAND_L = '(#[0-9A-Fa-f]{6})'/) || [])[1];
+  const handR = (appJs.match(/const HAND_R = '(#[0-9A-Fa-f]{6})'/) || [])[1];
+  ok(css.includes('--hand-l:     ' + handL), 'CSS left hand token matches the canvas');
+  ok(css.includes('--hand-r:     ' + handR), 'CSS right hand token matches the canvas');
+  ok(css.includes('.sw-l { background: ' + handL + '; }'), 'legend swatch matches the left hand colour');
+  ok(css.includes('.sw-r { background: ' + handR + '; }'), 'legend swatch matches the right hand colour');
+}
+ok(appHtml.includes('class="hand-legend"'), 'the practice room shows a colour legend');
+ok(/Left hand/.test(appHtml) && /Right hand/.test(appHtml), 'the legend names both hands');
+ok(/blue for your left hand/.test(appHtml), 'the guide states the colour rule in words');
+
+/* ---- 9h. written for a complete beginner ---- */
+head('plain english');
+ok(appHtml.includes('id="coach"'), 'a live plain-English instruction line is on screen');
+ok(/updateCoach/.test(appJs), 'the coach line is driven by the transport state');
+ok(/Waiting for you: play/.test(appJs), 'the app names the exact note it is waiting for');
+ok(/FINGER_NAMES/.test(appJs), 'and names the finger in words, not just a number');
+ok(/It is glowing on the keyboard/.test(appJs), 'and points at the key on the keyboard');
+ok(/paintNextKeys/.test(appJs), 'the next key to press is highlighted on the keybed');
+ok(appHtml.includes('id="letterMode"'), 'hand letters can be switched on and off');
+ok(/S\.showLetters/.test(appJs), 'hand letters are drawn on the blocks');
+ok(appHtml.includes('class="tool-glossary"'), 'every switch is explained in plain words');
+{
+  const terms = ['Wait mode', 'Read mode', 'Count in', 'Metronome', 'Hand letters',
+                 'Fingering', 'Note names', 'Play other hand', 'Sustain pedal', 'Use microphone'];
+  terms.forEach(t => ok(new RegExp('<dt>' + t + '</dt>').test(appHtml), `glossary explains: ${t}`));
+  // every switch in the tools row must have a glossary entry
+  const pills = [...appHtml.matchAll(/<button class="pill" id="(\w+)" aria-pressed/g)].map(m => m[1]);
+  ok(pills.length >= 9, `all ${pills.length} practice switches found`);
+}
+
 /* ---- 10. sitemap ---- */
 head('sitemap');
 const sm = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');

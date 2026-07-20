@@ -49,6 +49,14 @@
     'add 9': 'A plain major chord with the ninth added on top. Modern and airy.'
   };
 
+  /* Say which fingers to use, in words. A beginner reading "C E G" still
+     does not know what to do with their hand. */
+  function chordFingers(count) {
+    if (count === 3) return 'Right hand: thumb on the lowest note, middle finger, then little finger.';
+    if (count === 4) return 'Right hand: thumb, index finger, middle finger, then little finger.';
+    return 'Right hand: start with your thumb on the lowest note and spread the rest evenly.';
+  }
+
   function updateChord(play) {
     var root = 60 + ROOTS.indexOf(cRoot.value);
     var iv = CHORDS[cType.value];
@@ -56,7 +64,8 @@
     light(chordKb, midis);
     document.getElementById('chordName').textContent = cRoot.value + ' ' + cType.value;
     document.getElementById('chordNotes').textContent = midis.map(function (m) { return pitchClass(m); }).join(' \u00b7 ');
-    document.getElementById('chordWhy').textContent = CHORD_WHY[cType.value] || '';
+    document.getElementById('chordWhy').textContent =
+      (CHORD_WHY[cType.value] || '') + ' ' + chordFingers(midis.length);
     if (play) playSeq(midis, 0, true);
   }
   cRoot.addEventListener('change', function () { updateChord(false); });
@@ -89,7 +98,8 @@
     light(scaleKb, midis);
     document.getElementById('scaleName').textContent = sRoot.value + ' ' + sType.value;
     document.getElementById('scaleNotes').textContent = midis.map(function (m) { return pitchClass(m); }).join(' \u00b7 ');
-    document.getElementById('scaleWhy').textContent = SCALE_WHY[sType.value] || '';
+    document.getElementById('scaleWhy').textContent = (SCALE_WHY[sType.value] || '') +
+      ' Start with your right thumb on the lowest note. On a seven note scale, tuck your thumb under after the third note and carry on.';
     if (play) playSeq(midis, 260, false);
   }
   sRoot.addEventListener('change', function () { updateScale(false); });
