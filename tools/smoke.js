@@ -194,6 +194,31 @@ head('practice tracker');
   ok(doc.getElementById('bestList').innerHTML.trim().length > 10, 'best scores panel has its empty state');
 }
 
+/* ---------- the reading page builds itself ---------- */
+head('how to read music');
+{
+  const { doc, w, errors } = booted['how-to-read-music.html'];
+  ok(errors.length === 0, 'no errors during boot');
+  ok(doc.getElementById('trainerKeys').children.length > 15,
+    `trainer keyboard rendered (${doc.getElementById('trainerKeys').children.length} keys)`);
+  ok(doc.getElementById('trainerClef').options.length === 3, 'clef choices populated');
+  ok(doc.getElementById('trainerAcc').options.length === 2, 'accidental choices populated');
+  ok(doc.getElementById('trainerBest').textContent.trim().length > 0, 'best run reads from the store');
+  ['anatomyStave', 'trebleLinesStave', 'trebleSpacesStave', 'bassLinesStave', 'bassSpacesStave', 'ledgerStave']
+    .forEach(id => ok(!!doc.getElementById(id), `diagram canvas present: #${id}`));
+
+  // starting the trainer must actually pose a question
+  doc.getElementById('trainerStart').click();
+  ok(/Play this note/.test(doc.getElementById('trainerAsk').textContent),
+    'pressing Start asks for a note');
+  // and every "hear this" button must fire without throwing
+  let heardErrors = 0;
+  [...doc.querySelectorAll('[data-hear]')].forEach(b => {
+    try { b.click(); } catch (e) { heardErrors++; }
+  });
+  ok(heardErrors === 0, 'every listen button plays without throwing');
+}
+
 /* ---------- every button responds without throwing ---------- */
 head('every control');
 PAGES.forEach(p => {

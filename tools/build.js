@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ASSET_V = '8';
+const ASSET_V = '9';
 const SITE = 'https://learnpianokeys.com';
 const BRAND = 'Learn Piano Keys';
 
@@ -46,6 +46,14 @@ const PAGES = [
     desc: 'Never touched a piano? Six short steps, one octave, no jargon. Find middle C, name the white keys, put five fingers down and play your first real tune in about five minutes.',
     scripts: ['engine', 'gate', 'site', 'lesson'],
     crumbs: [['Lessons', '/#paths'], ['Piano keys for beginners', '/piano-keys-for-beginners.html']]
+  },
+  {
+    slug: 'how-to-read-music',
+    url: '/how-to-read-music.html',
+    title: 'How to Read Music Notes · Free interactive lessons and note trainer',
+    desc: 'Learn to read the treble and bass clef with playable diagrams, then practise with a free note trainer that shows a note and waits for you to play it. Works with a MIDI keyboard, mouse or computer keys.',
+    scripts: ['engine', 'gate', 'site', 'reading'],
+    crumbs: [['How to read music', '/how-to-read-music.html']]
   },
   {
     slug: 'tools',
@@ -109,6 +117,7 @@ function verifyTags() {
 function nav(active) {
   const items = [
     ['Start here', '/piano-keys-for-beginners.html', 'piano-keys-for-beginners'],
+    ['Read music', '/how-to-read-music.html', 'how-to-read-music'],
     ['Pieces', '/#pieces', 'index'],
     ['Tools', '/tools.html', 'tools'],
     ['Practice', '/practice.html', 'practice'],
@@ -219,6 +228,8 @@ ${body}
         <h2>Learn</h2>
         <a href="/piano-keys-for-beginners.html">Piano keys for beginners</a>
         <a href="/#paths">Learning paths</a>
+        <a href="/how-to-read-music.html">How to read music notes</a>
+        <a href="/how-to-read-music.html#trainer">Note trainer</a>
         <a href="/#basics">Piano keys explained</a>
       </div>
       <div>
@@ -316,6 +327,36 @@ const APP_SCHEMA = {
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' }
 };
 
+const READ_SCHEMA = {
+  '@type': 'HowTo',
+  '@id': SITE + '/how-to-read-music.html#howto',
+  name: 'How to read music notes on the piano',
+  description: 'Learn the stave, the treble clef, the bass clef, ledger lines and note lengths, then practise reading with an interactive note trainer.',
+  totalTime: 'PT10M',
+  supply: [{ '@type': 'HowToSupply', name: 'A piano, digital keyboard, or the on-screen keyboard' }],
+  tool: [{ '@type': 'HowToTool', name: 'Learn Piano Keys note trainer' }],
+  step: [
+    { '@type': 'HowToStep', name: 'Find middle C',
+      text: 'Middle C sits on a short line of its own between the treble and bass staves. On the keyboard it is the white key immediately to the left of any group of two black keys, nearest the middle of the instrument.',
+      url: SITE + '/how-to-read-music.html#stave' },
+    { '@type': 'HowToStep', name: 'Learn the treble clef',
+      text: 'The five lines are E, G, B, D and F from the bottom up. The four spaces are F, A, C and E, which spell FACE.',
+      url: SITE + '/how-to-read-music.html#treble' },
+    { '@type': 'HowToStep', name: 'Learn the bass clef',
+      text: 'The five lines are G, B, D, F and A from the bottom up. The four spaces are A, C, E and G.',
+      url: SITE + '/how-to-read-music.html#bass' },
+    { '@type': 'HowToStep', name: 'Read above and below the stave',
+      text: 'Ledger lines are short extra lines that continue the pattern for notes too high or too low to fit on the stave.',
+      url: SITE + '/how-to-read-music.html#ledger' },
+    { '@type': 'HowToStep', name: 'Learn how long each note lasts',
+      text: 'The shape of a note gives its length. A hollow note with no stem lasts four beats, with a stem two, a filled note with a stem one, and each flag halves it again.',
+      url: SITE + '/how-to-read-music.html#rhythm' },
+    { '@type': 'HowToStep', name: 'Practise with the note trainer',
+      text: 'A note appears on the stave and you play it on the keyboard. Ten minutes a day, treble clef first, then bass, then turn the note names off.',
+      url: SITE + '/how-to-read-music.html#trainer' }
+  ]
+};
+
 let count = 0;
 PAGES.forEach(p => {
   const body = fs.readFileSync(path.join(ROOT, 'src', p.slug + '.html'), 'utf8');
@@ -323,6 +364,7 @@ PAGES.forEach(p => {
   const faq = faqSchema(body, p.url);
   if (faq) extra.push(faq);
   if (p.slug === 'index') extra.push(APP_SCHEMA);
+  if (p.slug === 'how-to-read-music') extra.push(READ_SCHEMA);
   fs.writeFileSync(path.join(ROOT, p.slug + '.html'), shell(p, body, extra));
   count++;
 });

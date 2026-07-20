@@ -1,0 +1,223 @@
+<section class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">Reading music</p>
+    <h1>How to read music notes</h1>
+    <p class="answer-first">Music is written on a stave of five lines. Each line and each space stands for one letter from A to G, and where a note sits on the stave tells you which key to play. The treble clef carries the higher notes, usually your right hand. The bass clef carries the lower notes, usually your left. Middle C sits between the two. Learn those two clefs and one landmark note, and you can work out every other note on the page.</p>
+    <p class="lede">Below, every diagram is playable and there is a trainer at the end that shows you a note and waits for you to play it. This page is free and asks nothing of you, and it works with a MIDI keyboard, your mouse or your computer keys.</p>
+  </div>
+</section>
+
+<section id="trainer">
+  <div class="wrap">
+    <p class="eyebrow">The trainer</p>
+    <h2>Practise reading notes right now</h2>
+    <p class="lede" style="margin-bottom:24px">A note appears on the stave. Find it on the keyboard and play it. Most note-reading apps only ask you to name the note; this one makes you play it, which is the half that actually transfers to the piano.</p>
+
+    <div class="card reader-card">
+      <div class="reader-head">
+        <p class="quiz-ask" id="trainerAsk">Press start, then play the note you see.</p>
+        <span class="badge" id="trainerMidi">Checking for MIDI…</span>
+      </div>
+
+      <canvas id="trainerStave" role="img" aria-label="A single note shown on the stave"></canvas>
+
+      <div class="keybed short"><div class="keys" id="trainerKeys" role="group" aria-label="Keyboard for answering"></div></div>
+
+      <p class="step-feedback" id="trainerFeedback">&nbsp;</p>
+
+      <div class="tool-row" style="margin-top:6px">
+        <button class="btn btn-primary btn-sm" id="trainerStart">Start</button>
+        <label class="field"><span>Clef</span>
+          <select id="trainerClef">
+            <option value="treble">Treble only</option>
+            <option value="bass">Bass only</option>
+            <option value="both">Both, grand stave</option>
+          </select>
+        </label>
+        <label class="field"><span>Notes</span>
+          <select id="trainerAcc">
+            <option value="natural">White keys only</option>
+            <option value="all">Include sharps</option>
+          </select>
+        </label>
+        <button class="pill active" id="trainerNames" aria-pressed="true">Note names on</button>
+      </div>
+
+      <div class="quiz-score" style="margin-top:14px">
+        <span>Run <strong id="trainerScore">0</strong></span>
+        <span>Best run <strong id="trainerBest">0</strong></span>
+      </div>
+      <p class="score-note">Turn the note names off once you stop needing them. That is the moment you are genuinely reading rather than matching letters.</p>
+    </div>
+  </div>
+</section>
+
+<section id="stave">
+  <div class="wrap">
+    <p class="eyebrow">The basics</p>
+    <h2>What is a stave?</h2>
+    <p class="answer-first">A stave is the set of five horizontal lines that music is written on. Notes sit either on a line or in a space between two lines, and each position stands for a different pitch. Piano music uses two staves joined together, called a grand stave: the upper one for the right hand and the lower one for the left.</p>
+
+    <div class="figure">
+      <canvas id="anatomyStave" role="img" aria-label="A grand stave with middle C marked between the two staves"></canvas>
+      <div class="figure-cap">
+        <p>The grand stave. Treble clef above, bass clef below, and middle C on its own short line in between.</p>
+        <button class="pill" data-hear="60">Hear middle C</button>
+      </div>
+    </div>
+
+    <h2>Where is middle C?</h2>
+    <p class="answer-first">Middle C sits on a short line of its own, directly between the treble and bass staves. On the keyboard it is the C closest to the middle of the instrument, which you find by looking for any group of two black keys and taking the white key immediately to their left. Middle C is the landmark every other note is counted from.</p>
+    <p class="muted">If you are not yet sure where C is on the keyboard itself, do the <a href="/piano-keys-for-beginners.html">five minute beginner walkthrough</a> first. It takes about five minutes and ends with you playing a real tune.</p>
+  </div>
+</section>
+
+<section id="treble">
+  <div class="wrap">
+    <p class="eyebrow">Treble clef</p>
+    <h2>How do you read the treble clef?</h2>
+    <p class="answer-first">In the treble clef, the notes on the five lines are E, G, B, D and F from the bottom up. The notes in the four spaces are F, A, C and E from the bottom up, which spell the word FACE. The treble clef is also called the G clef because its curl wraps around the second line up, which is G.</p>
+
+    <div class="figure">
+      <canvas id="trebleLinesStave" role="img" aria-label="Treble clef lines, E G B D F from the bottom"></canvas>
+      <div class="figure-cap">
+        <p><b>The lines: E, G, B, D, F.</b> The old mnemonic is Every Good Boy Deserves Football, but any sentence you invent yourself will stick better.</p>
+        <button class="pill" data-hear="64,67,71,74,77">Hear the lines</button>
+      </div>
+    </div>
+
+    <div class="figure">
+      <canvas id="trebleSpacesStave" role="img" aria-label="Treble clef spaces, F A C E from the bottom"></canvas>
+      <div class="figure-cap">
+        <p><b>The spaces: F, A, C, E.</b> They spell FACE, which is the one piece of luck in the whole system.</p>
+        <button class="pill" data-hear="65,69,72,76">Hear the spaces</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="bass">
+  <div class="wrap">
+    <p class="eyebrow">Bass clef</p>
+    <h2>How do you read the bass clef?</h2>
+    <p class="answer-first">In the bass clef, the notes on the five lines are G, B, D, F and A from the bottom up. The notes in the four spaces are A, C, E and G from the bottom up. The bass clef is also called the F clef because its two dots sit either side of the fourth line up, which is F.</p>
+
+    <div class="figure">
+      <canvas id="bassLinesStave" role="img" aria-label="Bass clef lines, G B D F A from the bottom"></canvas>
+      <div class="figure-cap">
+        <p><b>The lines: G, B, D, F, A.</b> Good Boys Deserve Football Always, if you want the matching mnemonic.</p>
+        <button class="pill" data-hear="43,47,50,53,57">Hear the lines</button>
+      </div>
+    </div>
+
+    <div class="figure">
+      <canvas id="bassSpacesStave" role="img" aria-label="Bass clef spaces, A C E G from the bottom"></canvas>
+      <div class="figure-cap">
+        <p><b>The spaces: A, C, E, G.</b> All Cows Eat Grass is the usual one.</p>
+        <button class="pill" data-hear="45,48,52,55">Hear the spaces</button>
+      </div>
+    </div>
+
+    <p class="muted">A warning worth having early: the bass clef is <b>not</b> the treble clef shifted down. The same position means a different letter in each clef, which is why learning them separately is faster than trying to convert between them.</p>
+  </div>
+</section>
+
+<section id="ledger">
+  <div class="wrap">
+    <p class="eyebrow">Going higher and lower</p>
+    <h2>What are ledger lines?</h2>
+    <p class="answer-first">Ledger lines are short extra lines drawn above or below the stave for notes that are too high or too low to fit on it. They continue the same pattern of lines and spaces. Middle C is itself written on a ledger line, below the treble stave or above the bass stave.</p>
+
+    <div class="figure">
+      <canvas id="ledgerStave" role="img" aria-label="Notes above and below the stave using ledger lines"></canvas>
+      <div class="figure-cap">
+        <p>Middle C in the middle, a note below the treble stave, and one high above it.</p>
+        <button class="pill" data-hear="60,57,64,81">Hear them</button>
+      </div>
+    </div>
+
+    <h2>What do sharps and flats mean?</h2>
+    <p class="answer-first">A sharp sign raises a note by one semitone, which usually means playing the black key immediately to the right. A flat sign lowers it by one semitone, usually the black key immediately to the left. A natural sign cancels either of them. When these signs appear at the start of a line they form the key signature and apply to every bar that follows.</p>
+    <p class="muted">The same black key can be written two ways. The key between C and D is C sharp or D flat depending on the piece. It sounds identical either way, so do not let the two names slow you down at this stage.</p>
+  </div>
+</section>
+
+<section id="rhythm">
+  <div class="wrap">
+    <p class="eyebrow">The other half</p>
+    <h2>How do you read note lengths?</h2>
+    <p class="answer-first">The shape of a note tells you how long to hold it. A hollow note with no stem lasts four beats, a hollow note with a stem lasts two, a filled note with a stem lasts one, and each flag or beam added to the stem halves the length again. A dot after a note makes it half as long again.</p>
+
+    <div class="table-scroll">
+      <table class="compare">
+        <thead><tr><th>Note</th><th>Also called</th><th>Beats in 4/4</th><th>Looks like</th></tr></thead>
+        <tbody>
+          <tr><td>Semibreve</td><td>Whole note</td><td class="yes">4</td><td class="no">Hollow head, no stem</td></tr>
+          <tr><td>Minim</td><td>Half note</td><td class="yes">2</td><td class="no">Hollow head with a stem</td></tr>
+          <tr><td>Crotchet</td><td>Quarter note</td><td class="yes">1</td><td class="no">Filled head with a stem</td></tr>
+          <tr><td>Quaver</td><td>Eighth note</td><td class="yes">Half</td><td class="no">Filled head, stem, one flag</td></tr>
+          <tr><td>Semiquaver</td><td>Sixteenth note</td><td class="yes">Quarter</td><td class="no">Filled head, stem, two flags</td></tr>
+          <tr><td>Dotted crotchet</td><td>Dotted quarter</td><td class="yes">One and a half</td><td class="no">Filled head, stem, dot after it</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="muted">The number at the start of the music is the time signature. In 4/4, the most common one, there are four beats in every bar and a crotchet gets one beat. You can hear this in practice with the <a href="/tools.html#metronome">free metronome</a>, or feel it inside a real piece in the <a href="/app.html">practice room</a>, which scores your timing separately from your notes.</p>
+  </div>
+</section>
+
+<section id="practice">
+  <div class="wrap">
+    <p class="eyebrow">Making it stick</p>
+    <h2>How long does it take to learn to read music?</h2>
+    <p class="answer-first">Most adults can name every note on the treble and bass staves within two to four weeks of short daily practice, around ten minutes a day. Reading fluently while playing takes longer, usually a few months, because it is a different skill from naming notes on their own. Little and often works far better than occasional long sessions.</p>
+
+    <div class="grid g3" style="margin-top:30px">
+      <a class="path-card" href="#trainer">
+        <span class="card-num">01 / NAME THEM</span>
+        <h3>Drill the note trainer</h3>
+        <p>Ten minutes a day on the trainer above. Start with the treble clef and white keys, then add the bass clef, then turn the note names off.</p>
+        <span class="path-go">Back to the trainer &rarr;</span>
+      </a>
+      <a class="path-card" href="/app.html">
+        <span class="card-num">02 / READ THEM</span>
+        <h3>Switch on Read mode</h3>
+        <p>In the practice room, Read mode hides the falling blocks and leaves the written music. Only what you play then counts towards your reading score.</p>
+        <span class="path-go">Open the practice room &rarr;</span>
+      </a>
+      <a class="path-card" href="/tools.html">
+        <span class="card-num">03 / UNDERSTAND THEM</span>
+        <h3>See the shapes</h3>
+        <p>The chord finder and scale explorer draw the shapes on a keyboard, which is what makes written music start to look like patterns rather than dots.</p>
+        <span class="path-go">Open the tools &rarr;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="reading-faq">
+  <div class="wrap" style="max-width:820px">
+    <p class="eyebrow">Questions</p>
+    <h2>Common questions about reading music</h2>
+    <div style="margin-top:24px">
+      <details class="faq"><summary>Do I need to read music to play the piano?</summary>
+        <p>No, and plenty of people play well without it. But reading is the difference between playing the pieces somebody has prepared for you and playing anything you can find. It also makes learning new pieces far faster, because you stop having to memorise every note by ear or by watching a video.</p>
+      </details>
+      <details class="faq"><summary>What are the notes on the treble clef lines and spaces?</summary>
+        <p>The lines from the bottom up are E, G, B, D and F. The spaces from the bottom up are F, A, C and E, which spell FACE. The treble clef curl wraps around the second line, which is G, and that is why it is also called the G clef.</p>
+      </details>
+      <details class="faq"><summary>What are the notes on the bass clef lines and spaces?</summary>
+        <p>The lines from the bottom up are G, B, D, F and A. The spaces from the bottom up are A, C, E and G. The two dots of the bass clef sit either side of the fourth line, which is F, and that is why it is also called the F clef.</p>
+      </details>
+      <details class="faq"><summary>Why is middle C written differently in each clef?</summary>
+        <p>It is the same key on the piano either way. Middle C sits just below the treble stave and just above the bass stave, so it gets a short ledger line of its own in both. Seeing it written both ways is the quickest route to understanding how the two staves join up.</p>
+      </details>
+      <details class="faq"><summary>What is the fastest way to learn note names?</summary>
+        <p>Short daily drilling on a small range, rather than long occasional sessions on everything. Start with the treble clef, white keys only, and one octave either side of middle C. Add the bass clef once the treble feels automatic, then widen the range, then turn the note name labels off.</p>
+      </details>
+      <details class="faq"><summary>Is this free?</summary>
+        <p>Yes. This page and its trainer are free and ask nothing of you, and nothing here is stored anywhere but your own browser. The practice room asks for an email after three sessions, and that is free too.</p>
+      </details>
+    </div>
+  </div>
+</section>

@@ -719,3 +719,50 @@ kbd {
   padding: 14px 18px; margin: 22px 0 0;
   font-size: .92rem; color: var(--ivory-2); max-width: 68ch;
 }
+
+/* ---- v9: reading the stave ---- */
+
+/* the answer-first paragraph, written to be quotable on its own */
+.answer-first {
+  font-size: 1.14rem; line-height: 1.6; color: var(--ivory);
+  max-width: 70ch; margin: 0 0 1.1em;
+  padding-left: 16px; border-left: 3px solid var(--brass);
+}
+
+.figure {
+  background: var(--ink-2); border: 1px solid var(--ink-3);
+  border-radius: var(--r); padding: 18px 20px; margin: 0 0 20px;
+}
+.figure canvas { width: 100%; height: 150px; display: block; }
+.figure-cap {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--ink-3);
+}
+.figure-cap p { margin: 0; font-size: .9rem; color: var(--ivory-2); flex: 1 1 260px; }
+.figure-cap b { color: var(--ivory); }
+
+.reader-card { padding: 22px; }
+.reader-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 8px; }
+.reader-head .quiz-ask { flex: 1 1 auto; margin: 0; }
+#trainerStave { width: 100%; height: 190px; display: block; margin: 6px 0 14px; }
+.reader-card .keybed.short { height: 140px; }
+
+/* the banner band, used on the home page and the beginner page */
+.banner { background: var(--ink-2); }
+.banner-inner { display: grid; grid-template-columns: 1.35fr 1fr; gap: 40px; align-items: center; }
+.banner-inner h2 { margin-bottom: .35em; }
+.banner-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.banner-list li {
+  position: relative; padding-left: 26px; font-size: .93rem; color: var(--ivory-2);
+}
+.banner-list li::before {
+  content: ''; position: absolute; left: 0; top: .55em;
+  width: 9px; height: 9px; border-radius: 2px; background: var(--brass);
+}
+
+@media (max-width: 860px) {
+  .banner-inner { grid-template-columns: 1fr; gap: 26px; }
+  .figure canvas { height: 120px; }
+  #trainerStave { height: 155px; }
+  .answer-first { font-size: 1.05rem; }
+}

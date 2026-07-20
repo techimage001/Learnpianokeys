@@ -33,6 +33,23 @@ Edit `src/*.html` for body content and `tools/build.js` for head, nav and footer
 The test harness fails the build if two pages ever end up on different asset
 versions, which is the bug that silently shipped stale CSS on earlier projects.
 
+## The reading feature
+
+`/how-to-read-music.html` is the reading hub and the note trainer. It targets
+the "how to read music" cluster, which is a bigger head term than any single
+piece of repertoire.
+
+It is written to be extractable by AI overviews as well as ranked: every
+section opens with a `.answer-first` paragraph that answers the section's
+question completely on its own, in plain sentences, without needing the
+surrounding page. The generator emits a `HowTo` graph with six steps alongside
+the usual `FAQPage`, and the harness fails the build if a step loses its URL or
+its answer text.
+
+The stave renderer in `assets/reading.js` is deliberately self-contained rather
+than shared with the practice room, so adding this feature could not regress
+`app.js`.
+
 ## Getting indexed, everywhere and not just Google
 
 ### 1. Verify ownership with each engine
@@ -153,6 +170,7 @@ new device immediately.
     assets/app.js         practice room: transport, scoring, trouble spots, print
     assets/lesson.js      six-step first lesson
     assets/tools.js       chord finder, scale explorer, metronome, note quiz
+    assets/reading.js     stave renderer, teaching diagrams, note trainer
     assets/tracker.js     practice timer and streak
     assets/gate.js        signup gate
     assets/share.js       Web Share helpers

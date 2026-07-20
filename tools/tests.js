@@ -301,6 +301,43 @@ ok(appHtml.includes('class="tool-glossary"'), 'every switch is explained in plai
   ok(pills.length >= 9, `all ${pills.length} practice switches found`);
 }
 
+/* ---- 9i. the reading feature ---- */
+head('how to read music');
+const read = docs['how-to-read-music.html'];
+ok(!!read, 'the page exists');
+ok(/<h1>How to read music notes<\/h1>/.test(read), 'h1 targets the head term');
+ok((read.match(/class="answer-first"/g) || []).length >= 6,
+  'every section opens with a self-contained answer paragraph for AI overviews');
+['stave', 'treble', 'bass', 'ledger', 'rhythm', 'trainer', 'practice']
+  .forEach(id => ok(read.includes('id="' + id + '"'), `section present: #${id}`));
+ok(/E, G, B, D and F/.test(read), 'treble clef lines stated explicitly');
+ok(/F, A, C and E/.test(read), 'treble clef spaces stated explicitly');
+ok(/G, B, D, F and A/.test(read), 'bass clef lines stated explicitly');
+ok(/A, C, E and G/.test(read), 'bass clef spaces stated explicitly');
+{
+  const block = (read.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/) || [])[1];
+  const data = JSON.parse(block);
+  const howto = data['@graph'].find(g => g['@type'] === 'HowTo');
+  ok(!!howto, 'HowTo schema present');
+  ok(howto && howto.step.length === 6, `HowTo has all six steps (${howto ? howto.step.length : 0})`);
+  ok(howto && howto.step.every(st => st.url && st.text && st.text.length > 40),
+    'every HowTo step has a URL and a real answer');
+}
+// the trainer's controls
+['trainerStave', 'trainerKeys', 'trainerStart', 'trainerClef', 'trainerAcc', 'trainerNames',
+ 'trainerScore', 'trainerBest', 'trainerFeedback', 'trainerMidi']
+  .forEach(id => ok(read.includes('id="' + id + '"'), `trainer control present: #${id}`));
+// and the diagrams
+['anatomyStave', 'trebleLinesStave', 'trebleSpacesStave', 'bassLinesStave', 'bassSpacesStave', 'ledgerStave']
+  .forEach(id => ok(read.includes('id="' + id + '"'), `diagram present: #${id}`));
+ok((read.match(/data-hear=/g) || []).length >= 5, 'diagrams can be heard, not only seen');
+
+head('reading feature is linked in');
+['index.html', 'piano-keys-for-beginners.html', 'tools.html', 'app.html']
+  .forEach(p2 => ok(/href="\/how-to-read-music\.html/.test(docs[p2]), `${p2} links to the reading page`));
+ok(/id="read-banner"/.test(docs['index.html']), 'home page carries the banner');
+ok(/id="next-step"/.test(docs['piano-keys-for-beginners.html']), 'beginner page carries the next-step banner');
+pages.forEach(p2 => ok(/how-to-read-music\.html/.test(docs[p2]), `${p2}: reachable from the nav or footer`));
 /* ---- 10. sitemap ---- */
 head('sitemap');
 const sm = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
@@ -310,6 +347,7 @@ pages.filter(p => p !== 'app.html' && p !== '404.html').forEach(p => {
 });
 ok(!sm.includes('app.html'), 'sitemap excludes the noindex practice room');
 ok(!sm.includes('404.html'), 'sitemap excludes the 404 page');
+ok(sm.includes('/how-to-read-music.html'), 'sitemap covers the reading page');
 ok(!sm.includes('leads.php'), 'sitemap excludes admin');
 
 /* ---- 11. repertoire is public domain and scores are sane ---- */
