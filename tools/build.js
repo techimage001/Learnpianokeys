@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ASSET_V = '15';
+const ASSET_V = '17';
 const SITE = 'https://learnpianokeys.com';
 const AUTHOR = 'Learn Piano Keys';
 const BUILT = new Date().toISOString().slice(0, 10);
@@ -36,6 +36,7 @@ const tpl = require('./templates.js');
 const tpl2 = require('./templates2.js');
 const GUIDES = require('../data/guides.js');
 const TOOLPAGES = require('../data/toolpages.js');
+const LESSONS = require('./lessons-data.js');
 gen.emitRuntime();
 
 const SONGS  = gen.songPages();
@@ -51,8 +52,220 @@ SONGS.forEach(sp => {
   sp.noteSummary = used.length + ' different notes: ' + used.join(', ');
 });
 
+/* ---------------- the five lesson course, generated from lessons-data ---------------- */
+function esc2(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+function lessonBody(L, all) {
+  const prev = all.find(x => x.n === L.n - 1);
+  const next = all.find(x => x.n === L.n + 1);
+  const json = JSON.stringify({ slug: L.slug, exercise: L.exercise, quiz: L.quiz })
+    .replace(/</g, '\\u003c');
+  const sections = L.sections.map((sec, i) => {
+    /* one contextual link woven under a section, so the internal linking sits
+       inside the reading rather than in a box nobody reads */
+    const lk = L.links[i];
+    const tail = lk ? `\n    <p class="muted read-on">More on this: <a href="${lk[0]}">${esc2(lk[1])}</a>.</p>` : '';
+    return `    <h2>${esc2(sec.h)}</h2>\n` + sec.ps.map(t => `    <p class="muted">${esc2(t)}</p>`).join('\n') + tail;
+  }).join('\n');
+
+  const learnBox = `    <div class="card learn-box">
+      <span class="card-num">WHAT YOU WILL LEARN</span>
+      <ul class="learn-list">
+${L.learn.map(x => `        <li>${esc2(x)}</li>`).join('\n')}
+      </ul>
+      <p class="muted">About ten minutes of reading, a keyboard exercise you play yourself, and a ten question quiz at the end.</p>
+    </div>`;
+
+  const recapBox = `<section id="recap">
+  <div class="wrap" style="max-width:820px">
+    <div class="card">
+      <span class="card-num">QUICK RECAP</span>
+      <ul class="recap-list">
+${L.recap.map(x => `        <li>${esc2(x)}</li>`).join('\n')}
+      </ul>
+      <p class="muted">Read these four lines again before the quiz and you will almost certainly pass it first time.</p>
+    </div>
+  </div>
+</section>`;
+
+  const pairBox = `<section id="reference">
+  <div class="wrap" style="max-width:820px">
+    <p class="muted">Want the short version instead of the lesson? <a href="/${L.pair[0]}.html">${esc2(L.pair[1])}</a> is ${esc2(L.pair[2])}.</p>
+  </div>
+</section>`;
+  const isRhythm = L.exercise.type === 'rhythm';
+  const isStaff = L.exercise.type === 'staff';
+  return `<section class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">${esc2(L.eyebrow)}</p>
+    <h1>${esc2(L.navTitle)}</h1>
+    <p class="lede">${esc2(L.lede)}</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap" style="max-width:820px">
+${learnBox}
+${sections}
+  </div>
+</section>
+
+<section id="exercise" data-quiet-practice>
+  <div class="wrap">
+    <div class="card lesson-ex">
+      <span class="card-num">${esc2(L.exercise.heading).toUpperCase()}</span>
+      <p class="muted">${esc2(L.exercise.note)}</p>
+      ${isStaff ? '<div class="staff-wrap"><canvas id="exStaff" width="360" height="150" role="img" aria-label="A treble staff showing one note to name"></canvas></div>' : ''}
+      <p class="ex-prompt" id="exPrompt">Loading the exercise&hellip;</p>
+      ${isRhythm ? '<div class="beat-dots" id="exBeats" aria-hidden="true"></div>' : ''}
+      <div class="keybed lesson-kb"><div class="keys" id="exKeys" role="group" aria-label="Piano keyboard for this exercise"></div></div>
+      <p class="ex-feedback" id="exFeedback" aria-live="polite"></p>
+      <div class="tool-row" style="margin-top:14px">
+        <button class="btn btn-ghost btn-sm" id="exDemo" type="button">Hear the demo</button>
+        ${isRhythm ? '<button class="btn btn-primary btn-sm" id="exGo" type="button">Start the pattern</button>' : ''}
+        <span class="badge" id="exProgress"></span>
+      </div>
+      <div class="ex-done" id="exDone" hidden>
+        <p><b>Exercise complete.</b> Nicely done.</p>
+        ${L.exercise.handoff ? `<p class="muted">${esc2(L.exercise.handoff.text)}</p><p><a class="btn btn-primary btn-sm" href="${L.exercise.handoff.href}">${esc2(L.exercise.handoff.label)}</a></p>` : ''}
+      </div>
+    </div>
+  </div>
+</section>
+
+${recapBox}
+
+<section id="quiz">
+  <div class="wrap" style="max-width:820px">
+    <div class="card" id="quizBox">
+      <span class="card-num">TEST YOUR KNOWLEDGE</span>
+      <div id="quizIntro">
+        <p class="muted">Ten questions from this lesson, one at a time, four answers each. You get ten minutes, the same pace as a real theory test, and every answer is explained whether you get it right or not. Score ten out of ten and you are ready for the next lesson.</p>
+        <p class="score-note" id="quizBest"></p>
+        <label class="quiz-toggle"><input type="checkbox" id="quizNoClock"> Prefer no clock? Take it untimed.</label>
+        <p style="margin-top:14px"><button class="btn btn-primary" id="quizStart" type="button">Start the quiz</button></p>
+      </div>
+      <div id="quizLive" hidden></div>
+    </div>
+  </div>
+</section>
+
+<section id="lesson-faq">
+  <div class="wrap" style="max-width:820px">
+    <p class="eyebrow">Questions</p>
+    <h2>About this lesson</h2>
+    <div style="margin-top:24px">
+${L.faq.map(f => `      <details class="faq"><summary>${esc2(f.q)}</summary>\n        <p>${esc2(f.a)}</p>\n      </details>`).join('\n')}
+    </div>
+    <p class="lede" style="margin-top:28px">${prev ? `<a href="/${prev.slug}.html">&larr; Lesson ${prev.n}: ${esc2(prev.navTitle)}</a> &middot; ` : `<a href="/piano-keys-for-beginners.html">&larr; The five minute walkthrough</a> &middot; `}<a href="/piano-lessons.html">All lessons</a>${next ? ` &middot; <a href="/${next.slug}.html">Lesson ${next.n}: ${esc2(next.navTitle)} &rarr;</a>` : ` &middot; <a href="/app.html">To the practice room &rarr;</a>`}</p>
+  </div>
+</section>
+
+${pairBox}
+
+<script type="application/json" id="lessonData">${json}</script>`;
+}
+
+function lessonsHubBody(all) {
+  return `<section class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">The course</p>
+    <h1>Free piano lessons, in order</h1>
+    <p class="lede">Five lessons that take you from a wall of identical keys to reading real notes on a staff. Each one teaches a single idea, lets you practise it on a playable keyboard, and ends with a ten question quiz that tells you when you are ready to move on. Work through them in order, at whatever pace suits you. Nothing is locked.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap" style="max-width:820px">
+    <div class="card" style="margin-bottom:20px">
+      <span class="card-num">BEFORE LESSON 1</span>
+      <p class="muted"><b>Never touched a piano?</b> Start with the five minute walkthrough: six tiny steps that end with you playing the opening of a real tune. It asks nothing of you and takes about five minutes.</p>
+      <p><a class="btn btn-primary btn-sm" href="/piano-keys-for-beginners.html">Do the five minute walkthrough</a></p>
+    </div>
+    <div class="lesson-list" data-lessons-hub>
+${all.map(L => `      <a class="lesson-card" href="/${L.slug}.html" data-lesson="${L.slug}">
+        <span class="lesson-num">${L.n}</span>
+        <span class="lesson-body"><b>${esc2(L.navTitle)}</b><span class="muted">${esc2(L.lede.split('.')[0])}.</span><span class="lesson-status" data-lesson-status="${L.slug}"></span></span>
+        <span class="piece-go">Open &rarr;</span>
+      </a>`).join('\n')}
+    </div>
+    <p class="lede" style="margin-top:28px">Your quiz scores and exercise progress are saved in this browser and shown on your <a href="/practice.html">progress page</a>.</p>
+  </div>
+</section>
+
+<section id="how-it-works">
+  <div class="wrap" style="max-width:820px">
+    <h2>How each lesson works</h2>
+    <p class="muted">Every lesson is built the same way, so once you have done one you know exactly what to expect from the rest. There is no jargon, no sheet music you cannot yet read, and nothing you have to buy or sign up for.</p>
+    <p class="muted"><b>First you read.</b> One idea per lesson, explained in plain English, in about ten minutes. If a word needs explaining, it gets explained on the spot rather than in a glossary somewhere else.</p>
+    <p class="muted"><b>Then you play it.</b> A real keyboard sits inside the lesson. Keys light up in the colour of the hand you should use, with the finger number printed on them, and you follow the glow. If you would rather watch first, <b>Hear the demo</b> plays the whole exercise for you, keys and all, then hands it back.</p>
+    <p class="muted"><b>Then you test yourself.</b> Ten multiple choice questions, one at a time, four answers each. Right or wrong, you are told why, because the explanation is the part that teaches. Score ten out of ten and the lesson tells you that you are ready to move on. Score less and it suggests another read, which is advice, not a locked door.</p>
+    <p class="muted">You can play the keyboard by tapping it, by using your computer keys, or by plugging in a MIDI keyboard. Nothing needs installing and nothing needs tuning.</p>
+  </div>
+</section>
+
+<section id="who-for">
+  <div class="wrap" style="max-width:820px">
+    <h2>Who this course is for</h2>
+    <p class="muted">Complete beginners. If you have never sat at a piano, never read a note, and are not sure whether the black keys even matter, you are exactly who this was written for. Everything starts from nothing.</p>
+    <p class="muted">It suits a curious ten year old and a curious sixty year old equally, because the explanations do not assume anything and the exercises are played rather than read about. Younger learners tend to move fastest through lessons one to three; adults often prefer to slow down on rhythm and reading, which is lessons four and five.</p>
+    <p class="muted">It also works as a refresher. If you played as a child and the note names have faded, the five quizzes will find your gaps in about half an hour.</p>
+    <p class="muted">You do not need a real piano to start. A phone or a laptop is enough for the first three lessons, though a keyboard with real keys makes lessons two and four feel much more natural when you get there.</p>
+  </div>
+</section>
+
+<section id="course-time">
+  <div class="wrap" style="max-width:820px">
+    <h2>How long the whole course takes</h2>
+    <p class="muted">Each lesson runs about fifteen to twenty minutes: ten minutes reading, a few minutes on the keyboard exercise, and up to ten on the quiz. Five lessons is therefore an afternoon if you push, or a comfortable week at one lesson a day.</p>
+    <p class="muted">A week is the better plan. Rhythm and note reading both improve with sleep in between, and the quizzes are more useful when you take them a day after the lesson rather than three minutes after it. Nothing expires, so there is no reason to rush.</p>
+    <p class="muted">After lesson five, the natural next steps are the <a href="/app.html">practice room</a>, where you play real songs with the same glowing keys and timing feedback, and the <a href="/how-to-read-music.html">full reading guide</a>, which picks up the bass clef and note lengths where lesson five stops. The <a href="/beginner-piano-roadmap.html">beginner roadmap</a> lays out what comes after that.</p>
+  </div>
+</section>
+
+<section id="hub-faq">
+  <div class="wrap" style="max-width:820px">
+    <p class="eyebrow">Questions</p>
+    <h2>About the course</h2>
+    <div style="margin-top:24px">
+      <details class="faq"><summary>Do I have to take the lessons in order?</summary>
+        <p>It is the order they were written in, and each one leans on the one before, so working straight through is the fastest route. Nothing is locked though. If you already know the keyboard layout, open lesson two and start there.</p>
+      </details>
+      <details class="faq"><summary>Where are my quiz scores saved?</summary>
+        <p>In your own browser, on the device you used, rather than on a server. That is why your progress follows you on that device and does not appear on a different one, and why clearing your browser data clears it. Nothing about your practice is uploaded anywhere.</p>
+      </details>
+      <details class="faq"><summary>Do I need a real piano or keyboard?</summary>
+        <p>Not to start. The keyboard inside each lesson makes real sound in your browser, so a phone or laptop covers the first three lessons. Once you reach hand position and rhythm, physical keys under your fingers help a great deal, and a basic 61 key keyboard is enough for everything on this site.</p>
+      </details>
+      <details class="faq"><summary>What if I score badly on a quiz?</summary>
+        <p>Nothing happens except a suggestion to read the lesson again and retake it. Retakes are unlimited, and each one draws a fresh ten questions from a bank of twenty, so a retake is a genuinely different test rather than the same one in a new order. Only your best score is kept.</p>
+      </details>
+      <details class="faq"><summary>Is the quiz timer compulsory?</summary>
+        <p>No. Ten minutes for ten questions is the default because it mirrors a real theory test and keeps you focused, and it is far more time than the questions need. If a clock puts you off, tick the untimed box on the quiz start card and it will remember that choice.</p>
+      </details>
+      <details class="faq"><summary>Is this course suitable for children?</summary>
+        <p>The site is written for adults, but the language is deliberately plain and every idea is demonstrated on a keyboard rather than described in theory, so a child of about ten upwards can follow it comfortably. Younger children usually do better with a person sitting next to them.</p>
+      </details>
+    </div>
+  </div>
+</section>`;
+}
+
 /* Hubs, the policy page and every generated family, added to the page list. */
 const GENERATED = []
+  .concat([{ slug: 'piano-lessons', url: '/piano-lessons.html',
+      title: 'Free Piano Lessons for Beginners: A Five Lesson Course',
+      desc: 'Five free piano lessons in order: keyboard layout, finger numbers, steps and skips, rhythm, and reading the staff. Each with a quiz.',
+      scripts: ['engine', 'gate', 'site', 'lessons'],
+      crumbs: [['Lessons', '/piano-lessons.html']],
+      published: '2026-07-21', ogAlt: 'Five free piano lessons for beginners, each with a playable keyboard',
+      body: lessonsHubBody(LESSONS) }])
+  .concat(LESSONS.map(L => ({ slug: L.slug, url: '/' + L.slug + '.html',
+      title: L.metaTitle, desc: L.desc,
+      scripts: ['engine', 'gate', 'site', 'session', 'lessons'],
+      crumbs: [['Lessons', '/piano-lessons.html'], [L.navTitle, '/' + L.slug + '.html']],
+      published: '2026-07-21', ogAlt: L.ogAlt,
+      body: lessonBody(L, LESSONS) })))
   .concat(SONGS.map(x  => ({ slug: x.slug, url: '/' + x.slug + '.html', title: x.title, desc: x.desc,
       scripts: ['pieces','engine','gate','site','pagekit'], crumbs: [['Songs','/songs.html'],[x.piece.title,'/' + x.slug + '.html']],
       published: '2026-07-20', ogAlt: x.piece.title + ' piano notes for beginners',
@@ -99,7 +312,7 @@ const PAGES = [
     title: 'Piano Keys for Beginners: Your First Five Minutes',
     desc: 'Never touched a piano? Six short steps, one octave, no jargon. Find middle C and play a real tune in about five minutes. Free.',
     scripts: ['engine', 'gate', 'site', 'session', 'lesson'],
-    crumbs: [['Lessons', '/#paths'], ['Piano keys for beginners', '/piano-keys-for-beginners.html']]
+    crumbs: [['Lessons', '/piano-lessons.html'], ['Piano keys for beginners', '/piano-keys-for-beginners.html']]
   },
   {
     slug: 'how-to-read-music',
@@ -208,6 +421,7 @@ function verifyTags() {
 function nav(active) {
   const items = [
     ['Start here', '/piano-keys-for-beginners.html', 'piano-keys-for-beginners'],
+    ['Lessons', '/piano-lessons.html', 'piano-lessons'],
     ['Read music', '/how-to-read-music.html', 'how-to-read-music'],
     ['Songs', '/songs.html', 'songs'],
     ['Chords', '/chords.html', 'chords'],
@@ -535,6 +749,56 @@ const LEARNING_SCHEMA = {
   mainEntityOfPage: { '@id': SITE + '/how-to-read-music.html#webpage' }
 };
 
+const COURSE_SCHEMA = {
+  '@type': 'Course', '@id': SITE + '/piano-lessons.html#course',
+  name: 'Free Piano Lessons for Beginners',
+  description: 'A five lesson beginner piano course: keyboard layout, finger numbers, steps and skips, rhythm, and reading the treble staff. Each lesson has a playable keyboard exercise and a ten question quiz.',
+  url: SITE + '/piano-lessons.html',
+  provider: { '@id': SITE + '/#org' },
+  inLanguage: 'en-GB',
+  isAccessibleForFree: true,
+  educationalLevel: 'Beginner',
+  teaches: LESSONS.map(L => L.navTitle),
+  audience: { '@type': 'EducationalAudience', educationalRole: 'student' },
+  hasCourseInstance: {
+    '@type': 'CourseInstance', courseMode: 'online',
+    courseWorkload: 'PT20M',
+    instructor: { '@id': SITE + '/#org' }
+  },
+  hasPart: LESSONS.map(L => ({
+    '@type': 'LearningResource',
+    '@id': SITE + '/' + L.slug + '.html#lesson',
+    name: L.navTitle,
+    url: SITE + '/' + L.slug + '.html',
+    position: L.n,
+    learningResourceType: 'Lesson',
+    educationalLevel: 'Beginner',
+    isAccessibleForFree: true,
+    teaches: L.learn
+  })),
+  mainEntityOfPage: { '@id': SITE + '/piano-lessons.html#webpage' }
+};
+
+function lessonSchema(L) {
+  return {
+    '@type': 'LearningResource',
+    '@id': SITE + '/' + L.slug + '.html#lesson',
+    name: L.navTitle,
+    url: SITE + '/' + L.slug + '.html',
+    description: L.desc,
+    learningResourceType: ['Lesson', 'Quiz'],
+    educationalLevel: 'Beginner',
+    teaches: L.learn,
+    timeRequired: 'PT20M',
+    inLanguage: 'en-GB',
+    isAccessibleForFree: true,
+    isPartOf: { '@id': SITE + '/piano-lessons.html#course' },
+    provider: { '@id': SITE + '/#org' },
+    audience: { '@type': 'EducationalAudience', educationalRole: 'student' },
+    mainEntityOfPage: { '@id': SITE + '/' + L.slug + '.html#webpage' }
+  };
+}
+
 let count = 0;
 PAGES.push.apply(PAGES, GENERATED);
 PAGES.forEach(p => {
@@ -544,6 +808,8 @@ PAGES.forEach(p => {
   if (faq) extra.push(faq);
   if (p.slug === 'index') extra.push(APP_SCHEMA);
   if (p.slug === 'how-to-read-music') { extra.push(READ_SCHEMA); extra.push(LEARNING_SCHEMA); }
+  if (p.slug === 'piano-lessons') extra.push(COURSE_SCHEMA);
+  { const L = LESSONS.find(x => x.slug === p.slug); if (L) extra.push(lessonSchema(L)); }
   fs.writeFileSync(path.join(ROOT, p.slug + '.html'), shell(p, body, extra));
   count++;
 });

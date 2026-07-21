@@ -49,6 +49,8 @@
     var note = document.getElementById('todayNote');
     if (note) note.textContent = todaySec ? 'Logged today. That is the hard part done.' : 'Ready when you are.';
 
+    paintLessons(s);
+
     var lp = document.getElementById('lessonProgress');
     if (lp) {
       lp.textContent = s.lessonDone
@@ -60,6 +62,40 @@
 
     paintBest(s);
     paintChart();
+  }
+
+  /* ------- the lesson course ------- */
+  var COURSE = [
+    ['piano-lesson-keyboard-layout', 'Lesson 1: The keyboard map'],
+    ['piano-lesson-finger-numbers', 'Lesson 2: Fingers and hand position'],
+    ['piano-lesson-steps-and-skips', 'Lesson 3: Steps, skips and your first melody'],
+    ['piano-lesson-rhythm-and-counting', 'Lesson 4: Rhythm and counting'],
+    ['piano-lesson-reading-the-staff', 'Lesson 5: Reading the staff']
+  ];
+
+  function paintLessons(s) {
+    var box = document.getElementById('lessonList');
+    if (!box) return;
+    var ex = s.lessons2 || {};
+    var qz = s.quizL || {};
+    box.innerHTML = '';
+    COURSE.forEach(function (pair) {
+      var row = document.createElement('div');
+      row.className = 'course-row';
+      var name = document.createElement('span');
+      name.textContent = pair[1];
+      var stat = document.createElement('span');
+      stat.className = 'course-stat';
+      var bits = [];
+      if (ex[pair[0]] && ex[pair[0]].ex) bits.push('exercise done');
+      var b = qz[pair[0]];
+      if (b && b.best != null) bits.push('best quiz ' + b.best + '%' + (b.untimed ? ' untimed' : ''));
+      stat.textContent = bits.length ? bits.join(' \u00b7 ') : 'not started';
+      if (bits.length) stat.classList.add('has-progress');
+      row.appendChild(name);
+      row.appendChild(stat);
+      box.appendChild(row);
+    });
   }
 
   /* ------- best scores as labelled bars ------- */

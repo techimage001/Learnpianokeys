@@ -353,6 +353,32 @@ head('contrast');
 ok(/\.nav a\.btn-primary[^{]*\{[^}]*color:\s*var\(--brass-ink\)/.test(css),
   'nav primary button keeps its own text colour (the .nav a specificity trap)');
 ok(/\.nav a\.btn-ghost/.test(css), 'nav ghost button keeps its own text colour');
+/* ---------- the lesson course: banks and page contract ---------- */
+{
+  const LESSONS = require('./lessons-data.js');
+  ok(LESSONS.length === 5, 'five lessons in the course');
+  LESSONS.forEach(L => {
+    ok(L.quiz.length === 20, `${L.slug}: bank holds exactly 20 questions (${L.quiz.length})`);
+    const texts = new Set(L.quiz.map(q => q.q));
+    ok(texts.size === 20, `${L.slug}: all 20 questions are distinct`);
+    L.quiz.forEach((q, i) => {
+      ok(q.options.length === 4, `${L.slug} q${i + 1}: four options`);
+      ok(new Set(q.options).size === 4, `${L.slug} q${i + 1}: options are distinct`);
+      ok(q.a >= 0 && q.a <= 3, `${L.slug} q${i + 1}: correct index in range`);
+      ok(typeof q.explain === 'string' && q.explain.length > 20, `${L.slug} q${i + 1}: has a real explanation`);
+    });
+    const page = fs.readFileSync(path.join(ROOT, L.slug + '.html'), 'utf8');
+    ['exKeys', 'exPrompt', 'exFeedback', 'exProgress', 'exDemo', 'exDone',
+     'quizStart', 'quizIntro', 'quizLive', 'quizNoClock', 'quizBest', 'lessonData']
+      .forEach(id => ok(page.includes(`id="${id}"`), `${L.slug}: carries #${id}`));
+    ok(page.includes('data-quiet-practice'), `${L.slug}: minutes count silently`);
+  });
+  const hub = fs.readFileSync(path.join(ROOT, 'piano-lessons.html'), 'utf8');
+  LESSONS.forEach(L => ok(hub.includes('/' + L.slug + '.html'), `hub links lesson ${L.n}`));
+  const progress = fs.readFileSync(path.join(ROOT, 'practice.html'), 'utf8');
+  ok(progress.includes('id="lessonList"'), 'progress page carries the course card');
+}
+
 {
   // duplicate @keyframes names resolve differently across engines and once
   // killed the next-key glow; one name must mean exactly one definition

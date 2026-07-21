@@ -23,7 +23,20 @@ function ring(list, self, n) {
   return out;
 }
 
+/* Each reference guide points at the lesson that teaches the same ground with
+   an exercise. Reference answers the quick question, the lesson teaches it:
+   different intent, so they support each other instead of competing. */
+const LESSON_FOR = {
+  'piano-keyboard-layout': ['piano-lesson-keyboard-layout', 'Lesson 1: the keyboard map', 'find every note yourself on a playable keyboard, then test it with ten questions'],
+  'middle-c-on-piano': ['piano-lesson-keyboard-layout', 'Lesson 1: the keyboard map', 'practise finding C and the other landmarks on a keyboard inside the lesson'],
+  'piano-finger-numbers': ['piano-lesson-finger-numbers', 'Lesson 2: fingers and hand position', 'set both hands in C position and play the numbers rather than read them'],
+  'online-piano-metronome': ['piano-lesson-rhythm-and-counting', 'Lesson 4: rhythm and counting', 'tap real rhythms against this metronome with every tap judged'],
+  'piano-scale-finder': ['piano-lesson-steps-and-skips', 'Lesson 3: steps, skips and your first melody', 'learn the moves scales are built from'],
+  'beginner-piano-roadmap': ['piano-lessons', 'the five lesson course', 'work through the whole beginner path in order']
+};
+
 function guideBody(g, siblings) {
+  const les = LESSON_FOR[g.slug];
   const sameHub = siblings.filter(s => s.hub === g.hub && s.slug !== g.slug).slice(0, 2);
   const rotated = ring(siblings, g.slug, 4).filter(x => !sameHub.some(h => h.slug === x.slug));
   const rel = sameHub.concat(rotated).slice(0, 4);
@@ -51,7 +64,16 @@ ${g.sections.map((s, i) => `<section id="s${i + 1}">
   </div>
 </section>`).join('\n\n')}
 
-<section id="next">
+${les ? `<section id="lesson-link">
+  <div class="wrap">
+    <div class="card">
+      <span class="card-num">PRACTISE IT</span>
+      <p class="muted">This page answers the question. <a href="/${les[0]}.html">${esc(les[1])}</a> lets you ${esc(les[2])}. It is free, and it starts the moment you open it.</p>
+    </div>
+  </div>
+</section>
+
+` : ''}<section id="next">
   <div class="wrap">
     <p class="eyebrow">Keep going</p>
     <h2>Read next</h2>

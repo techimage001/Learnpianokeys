@@ -13,7 +13,7 @@
   /* Two homes: the practice room shows the clock; the beginner lesson counts
      the same minutes silently, with no clock on screen, as that page promises. */
   var silent = !timeEl || !finEl;
-  if (silent && !document.getElementById('lessonKeys')) return;
+  if (silent && !document.getElementById('lessonKeys') && !document.querySelector('[data-quiet-practice]')) return;
 
   var IDLE_MS = 3 * 60 * 1000;
 
