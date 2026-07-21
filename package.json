@@ -5,7 +5,8 @@
     "build": "node tools/build.js",
     "test": "node tools/tests.js && node tools/smoke.js",
     "release": "node tools/build.js && node tools/tests.js && node tools/smoke.js",
-    "submit": "node tools/submit-index.js"
+    "submit": "node tools/submit-index.js",
+    "indexnow": "node tools/indexnow.js"
   },
   "devDependencies": {
     "jsdom": "^24.1.3"
