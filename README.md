@@ -3,6 +3,40 @@
 Static site plus a small PHP lead collector. No build dependencies, no
 frameworks, no paid APIs, no sampled audio.
 
+## Content architecture
+
+Pages are generated, not hand-written. Three families are computed:
+
+    data/pieces.js       every piece in compact notation, one line per bar
+    data/notation.js     parses it and validates that every bar adds up
+    tools/gen-content.js emits assets/pieces.js plus the song, chord and
+                         scale page definitions
+    tools/templates.js   the page body for each family
+    tools/make-cards.py  one social card per page, from that page's own h1
+
+Adding a song means adding one entry to `data/pieces.js`. The parser refuses
+anything whose bars do not add up, so a mistyped duration fails the build
+rather than shipping.
+
+Chords and scales are spelled properly, by letter and degree: F major is
+B flat, never A sharp. That is asserted in the harness.
+
+## The page families
+
+    10  original pages (home, app, beginner walkthrough, reading, legal)
+     8  song pages          data/pieces.js  -> tools/templates.js
+    12  chord pages         computed from intervals, correctly spelled
+    12  scale pages         computed from intervals, correctly spelled
+    20  educational guides  data/guides.js  -> tools/templates2.js
+    10  tool pages          data/toolpages.js, each holding the real tool
+     4  hubs + policy page
+    --
+    76  pages
+
+Adding a guide means adding one object to `data/guides.js`. Adding a song
+means one entry in `data/pieces.js`, and the notation parser refuses anything
+whose bars do not add up.
+
 ## Build
 
     node tools/build.js      # regenerates every .html from src/ + sitemap + manifest

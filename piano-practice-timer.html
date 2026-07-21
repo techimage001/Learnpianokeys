@@ -3,33 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Terms of Use</title>
-  <meta name="description" content="Terms of use for Learn Piano Keys, a free browser piano practice tool.">
+  <title>Piano Practice Timer and Streak Tracker</title>
+  <meta name="description" content="Time your practice, save the minutes and build a streak. Kept privately in your own browser, nothing to set up.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <meta name="theme-color" content="#14100F">
-  <link rel="canonical" href="https://learnpianokeys.com/terms.html">
+  <link rel="canonical" href="https://learnpianokeys.com/piano-practice-timer.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Learn Piano Keys">
-  <meta property="og:title" content="Terms of Use">
-  <meta property="og:description" content="Terms of use for Learn Piano Keys, a free browser piano practice tool.">
-  <meta property="og:url" content="https://learnpianokeys.com/terms.html">
-  <meta property="og:image" content="https://learnpianokeys.com/og-terms.png">
+  <meta property="og:title" content="Piano Practice Timer and Streak Tracker">
+  <meta property="og:description" content="Time your practice, save the minutes and build a streak. Kept privately in your own browser, nothing to set up.">
+  <meta property="og:url" content="https://learnpianokeys.com/piano-practice-timer.html">
+  <meta property="og:image" content="https://learnpianokeys.com/og-piano-practice-timer.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:type" content="image/png">
-  <meta property="og:image:alt" content="Terms of use for Learn Piano Keys">
+  <meta property="og:image:alt" content="Piano practice timer, a free tool on Learn Piano Keys">
   <meta property="og:locale" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Terms of Use">
-  <meta name="twitter:description" content="Terms of use for Learn Piano Keys, a free browser piano practice tool.">
-  <meta name="twitter:image" content="https://learnpianokeys.com/og-terms.png">
-  <meta name="twitter:image:alt" content="Terms of use for Learn Piano Keys">
+  <meta name="twitter:title" content="Piano Practice Timer and Streak Tracker">
+  <meta name="twitter:description" content="Time your practice, save the minutes and build a streak. Kept privately in your own browser, nothing to set up.">
+  <meta name="twitter:image" content="https://learnpianokeys.com/og-piano-practice-timer.png">
+  <meta name="twitter:image:alt" content="Piano practice timer, a free tool on Learn Piano Keys">
   <meta name="author" content="Learn Piano Keys">
   <meta name="format-detection" content="telephone=no">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Piano Keys">
-  <link rel="alternate" hreflang="en-gb" href="https://learnpianokeys.com/terms.html">
-  <link rel="alternate" hreflang="x-default" href="https://learnpianokeys.com/terms.html">
+  <link rel="alternate" hreflang="en-gb" href="https://learnpianokeys.com/piano-practice-timer.html">
+  <link rel="alternate" hreflang="x-default" href="https://learnpianokeys.com/piano-practice-timer.html">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png">
@@ -74,34 +74,76 @@
   </div>
 </header>
 
-<nav class="crumbs" aria-label="Breadcrumb"><div class="wrap"><a href="/">Home</a><span class="sep">/</span><span aria-current="page">Terms</span></div></nav>
-<main id="main" class="narrow">
-<section>
+<nav class="crumbs" aria-label="Breadcrumb"><div class="wrap"><a href="/">Home</a><span class="sep">/</span><a href="/tools.html">Tools</a><span class="sep">/</span><span aria-current="page">Piano practice timer</span></div></nav>
+<main id="main">
+<section class="page-head">
   <div class="wrap">
-    <p class="eyebrow">The rules</p>
-    <h1>Terms of use</h1>
-    <p class="lede">Use the site sensibly and it is yours to use.</p>
-
-    <h2>What this is</h2>
-    <p class="muted">Learn Piano Keys is a practice tool. It is not a substitute for a teacher, and nothing here is a guarantee of any particular result or standard.</p>
-
-    <h2>The music</h2>
-    <p class="muted">Every piece on this site is in the public domain. The arrangements, fingering, scoring engine, code and design are ours. You are welcome to use them to practise and to print the sheet music for your own use; please do not copy them wholesale onto another site.</p>
-
-    <h2>Availability</h2>
-    <p class="muted">The site is provided as it is. Features may change, and we cannot promise it will be available without interruption or that it will work identically in every browser.</p>
-
-    <h2>Your equipment</h2>
-    <p class="muted">You are responsible for your own instrument, hardware and hearing. Set your volume sensibly before you start, particularly when using headphones.</p>
-
-    <h2>Signing up</h2>
-    <p class="muted">Signing up is free. No payment is taken and no card details are requested. You can unsubscribe from any email we send, and you can ask us to delete your address by writing to info@learnpianokeys.com.</p>
-
-    <h2>Liability</h2>
-    <p class="muted">To the extent the law allows, we are not liable for any loss arising from your use of the site. Nothing here limits any right you have that cannot be limited by law.</p>
+    <p class="eyebrow">Free tool</p>
+    <h1>Piano practice timer</h1>
+    <p class="answer-first">Start the timer when you sit down and stop and save when you finish. Your minutes are added to today and your streak grows for each consecutive day you practise. Everything is stored in your own browser rather than on a server, so nothing is uploaded and nothing follows you around.</p>
   </div>
 </section>
 
+<section id="tool">
+  <div class="wrap">
+    <div class="card tool" data-tool="timer">
+      <p class="timer-clock" id="tkClock">00:00</p>
+    <div class="tool-row">
+      <button class="btn btn-primary btn-sm" id="tkStart">Start</button>
+      <button class="btn btn-ghost btn-sm" id="tkSave">Stop and save</button>
+    </div>
+    <div class="grid g3" style="margin-top:20px">
+      <div class="card stat"><span class="card-num">TODAY</span><p class="stat-val"><strong id="tkToday">0</strong> min</p></div>
+      <div class="card stat"><span class="card-num">STREAK</span><p class="stat-val"><strong id="tkStreak">0</strong> days</p></div>
+      <div class="card stat"><span class="card-num">ALL TIME</span><p class="stat-val"><strong id="tkTotal">0</strong> min</p></div>
+    </div>
+    <p class="score-note" id="tkWhy">Time is added only when you stop and save, so leaving the tab open will not inflate it.</p>
+    </div>
+  </div>
+</section>
+
+<section id="more">
+  <div class="wrap">
+    <p class="eyebrow">More tools</p>
+    <h2>Everything else here is free too</h2>
+    <div class="grid" style="gap:12px">
+      <a class="piece" href="/online-piano-keyboard.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Online piano keyboard</span><br><span class="piece-c">A playable piano in your browser. Use the mouse, your computer keys or a MIDI keyboard. </span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+      <a class="piece" href="/circle-of-fifths-piano.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Interactive circle of fifths</span><br><span class="piece-c">Click any key to see its sharps or flats, its scale on a keyboard and its related chords</span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+      <a class="piece" href="/piano-chord-finder.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Piano chord finder</span><br><span class="piece-c">Pick any root and chord type and see it drawn on a keyboard, hear it played, and read th</span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+      <a class="piece" href="/piano-chord-identifier.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Piano chord identifier</span><br><span class="piece-c">Play or click notes on the keyboard and this tool names the chord, including inversions.</span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+      <a class="piece" href="/piano-scale-finder.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Piano scale finder</span><br><span class="piece-c">See any scale drawn on a keyboard with the correct spelling and fingering, and hear it p</span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+
+<section id="faq">
+  <div class="wrap" style="max-width:820px">
+    <p class="eyebrow">Questions</p>
+    <h2>Common questions</h2>
+    <div style="margin-top:24px">
+      <details class="faq"><summary>How much should I practise a day?</summary>
+        <p>Fifteen to twenty minutes daily takes most beginners further than two hours at the weekend, because the skills consolidate between sessions.</p>
+      </details>
+      <details class="faq"><summary>Where is my practice history stored?</summary>
+        <p>In your own browser on this device. It is never sent anywhere and we cannot see it.</p>
+      </details>
+      <details class="faq"><summary>What happens if I miss a day?</summary>
+        <p>The streak resets to one on your next session. There is no penalty beyond that. It is a mirror, not a game.</p>
+      </details>
+    </div>
+  </div>
+</section>
 </main>
 
 <footer class="site-foot">
@@ -187,6 +229,7 @@
 <script src="/assets/engine.js?v=13"></script>
 <script src="/assets/gate.js?v=13"></script>
 <script src="/assets/site.js?v=13"></script>
+<script src="/assets/toolkit.js?v=13"></script>
 
 <script type="application/ld+json">
 {
@@ -218,10 +261,10 @@
     },
     {
       "@type": "WebPage",
-      "@id": "https://learnpianokeys.com/terms.html#webpage",
-      "url": "https://learnpianokeys.com/terms.html",
-      "name": "Terms of Use",
-      "description": "Terms of use for Learn Piano Keys, a free browser piano practice tool.",
+      "@id": "https://learnpianokeys.com/piano-practice-timer.html#webpage",
+      "url": "https://learnpianokeys.com/piano-practice-timer.html",
+      "name": "Piano Practice Timer and Streak Tracker",
+      "description": "Time your practice, save the minutes and build a streak. Kept privately in your own browser, nothing to set up.",
       "isPartOf": {
         "@id": "https://learnpianokeys.com/#website"
       },
@@ -229,15 +272,15 @@
         "@id": "https://learnpianokeys.com/#org"
       },
       "inLanguage": "en-GB",
-      "datePublished": "2026-07-18",
+      "datePublished": "2026-07-20",
       "dateModified": "2026-07-21",
       "isAccessibleForFree": true,
       "primaryImageOfPage": {
         "@type": "ImageObject",
-        "url": "https://learnpianokeys.com/og-terms.png",
+        "url": "https://learnpianokeys.com/og-piano-practice-timer.png",
         "width": 1200,
         "height": 630,
-        "caption": "Terms of use for Learn Piano Keys"
+        "caption": "Piano practice timer, a free tool on Learn Piano Keys"
       },
       "author": {
         "@id": "https://learnpianokeys.com/#org"
@@ -246,12 +289,19 @@
         "@id": "https://learnpianokeys.com/#org"
       },
       "breadcrumb": {
-        "@id": "https://learnpianokeys.com/terms.html#breadcrumb"
+        "@id": "https://learnpianokeys.com/piano-practice-timer.html#breadcrumb"
+      },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "h1",
+          ".answer-first"
+        ]
       }
     },
     {
       "@type": "BreadcrumbList",
-      "@id": "https://learnpianokeys.com/terms.html#breadcrumb",
+      "@id": "https://learnpianokeys.com/piano-practice-timer.html#breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
@@ -262,8 +312,55 @@
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "Terms",
-          "item": "https://learnpianokeys.com/terms.html"
+          "name": "Tools",
+          "item": "https://learnpianokeys.com/tools.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Piano practice timer",
+          "item": "https://learnpianokeys.com/piano-practice-timer.html"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://learnpianokeys.com/piano-practice-timer.html#faq",
+      "mainEntityOfPage": {
+        "@id": "https://learnpianokeys.com/piano-practice-timer.html#webpage"
+      },
+      "inLanguage": "en-GB",
+      "isAccessibleForFree": true,
+      "author": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "publisher": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much should I practise a day?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Fifteen to twenty minutes daily takes most beginners further than two hours at the weekend, because the skills consolidate between sessions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is my practice history stored?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In your own browser on this device. It is never sent anywhere and we cannot see it."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens if I miss a day?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The streak resets to one on your next session. There is no penalty beyond that. It is a mirror, not a game."
+          }
         }
       ]
     }

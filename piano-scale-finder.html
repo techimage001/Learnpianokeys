@@ -3,33 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Terms of Use</title>
-  <meta name="description" content="Terms of use for Learn Piano Keys, a free browser piano practice tool.">
+  <title>Piano Scale Finder: Notes and Fingering</title>
+  <meta name="description" content="See any scale drawn on a keyboard with the correct spelling and fingering, and hear it played. Ten scale types, every key.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <meta name="theme-color" content="#14100F">
-  <link rel="canonical" href="https://learnpianokeys.com/terms.html">
+  <link rel="canonical" href="https://learnpianokeys.com/piano-scale-finder.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Learn Piano Keys">
-  <meta property="og:title" content="Terms of Use">
-  <meta property="og:description" content="Terms of use for Learn Piano Keys, a free browser piano practice tool.">
-  <meta property="og:url" content="https://learnpianokeys.com/terms.html">
-  <meta property="og:image" content="https://learnpianokeys.com/og-terms.png">
+  <meta property="og:title" content="Piano Scale Finder: Notes and Fingering">
+  <meta property="og:description" content="See any scale drawn on a keyboard with the correct spelling and fingering, and hear it played. Ten scale types, every key.">
+  <meta property="og:url" content="https://learnpianokeys.com/piano-scale-finder.html">
+  <meta property="og:image" content="https://learnpianokeys.com/og-piano-scale-finder.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:type" content="image/png">
-  <meta property="og:image:alt" content="Terms of use for Learn Piano Keys">
+  <meta property="og:image:alt" content="Piano scale finder, a free tool on Learn Piano Keys">
   <meta property="og:locale" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Terms of Use">
-  <meta name="twitter:description" content="Terms of use for Learn Piano Keys, a free browser piano practice tool.">
-  <meta name="twitter:image" content="https://learnpianokeys.com/og-terms.png">
-  <meta name="twitter:image:alt" content="Terms of use for Learn Piano Keys">
+  <meta name="twitter:title" content="Piano Scale Finder: Notes and Fingering">
+  <meta name="twitter:description" content="See any scale drawn on a keyboard with the correct spelling and fingering, and hear it played. Ten scale types, every key.">
+  <meta name="twitter:image" content="https://learnpianokeys.com/og-piano-scale-finder.png">
+  <meta name="twitter:image:alt" content="Piano scale finder, a free tool on Learn Piano Keys">
   <meta name="author" content="Learn Piano Keys">
   <meta name="format-detection" content="telephone=no">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Piano Keys">
-  <link rel="alternate" hreflang="en-gb" href="https://learnpianokeys.com/terms.html">
-  <link rel="alternate" hreflang="x-default" href="https://learnpianokeys.com/terms.html">
+  <link rel="alternate" hreflang="en-gb" href="https://learnpianokeys.com/piano-scale-finder.html">
+  <link rel="alternate" hreflang="x-default" href="https://learnpianokeys.com/piano-scale-finder.html">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png">
@@ -74,34 +74,73 @@
   </div>
 </header>
 
-<nav class="crumbs" aria-label="Breadcrumb"><div class="wrap"><a href="/">Home</a><span class="sep">/</span><span aria-current="page">Terms</span></div></nav>
-<main id="main" class="narrow">
-<section>
+<nav class="crumbs" aria-label="Breadcrumb"><div class="wrap"><a href="/">Home</a><span class="sep">/</span><a href="/tools.html">Tools</a><span class="sep">/</span><span aria-current="page">Piano scale finder</span></div></nav>
+<main id="main">
+<section class="page-head">
   <div class="wrap">
-    <p class="eyebrow">The rules</p>
-    <h1>Terms of use</h1>
-    <p class="lede">Use the site sensibly and it is yours to use.</p>
-
-    <h2>What this is</h2>
-    <p class="muted">Learn Piano Keys is a practice tool. It is not a substitute for a teacher, and nothing here is a guarantee of any particular result or standard.</p>
-
-    <h2>The music</h2>
-    <p class="muted">Every piece on this site is in the public domain. The arrangements, fingering, scoring engine, code and design are ours. You are welcome to use them to practise and to print the sheet music for your own use; please do not copy them wholesale onto another site.</p>
-
-    <h2>Availability</h2>
-    <p class="muted">The site is provided as it is. Features may change, and we cannot promise it will be available without interruption or that it will work identically in every browser.</p>
-
-    <h2>Your equipment</h2>
-    <p class="muted">You are responsible for your own instrument, hardware and hearing. Set your volume sensibly before you start, particularly when using headphones.</p>
-
-    <h2>Signing up</h2>
-    <p class="muted">Signing up is free. No payment is taken and no card details are requested. You can unsubscribe from any email we send, and you can ask us to delete your address by writing to info@learnpianokeys.com.</p>
-
-    <h2>Liability</h2>
-    <p class="muted">To the extent the law allows, we are not liable for any loss arising from your use of the site. Nothing here limits any right you have that cannot be limited by law.</p>
+    <p class="eyebrow">Free tool</p>
+    <h1>Piano scale finder</h1>
+    <p class="answer-first">Choose a root note and a scale type and this tool shows the scale on a keyboard, plays it, and lists the notes with correct spelling. It covers major, the three minors, both pentatonics, blues, dorian, mixolydian and chromatic, from any of the twelve starting notes.</p>
   </div>
 </section>
 
+<section id="tool">
+  <div class="wrap">
+    <div class="card tool" data-tool="scale">
+      <div class="tool-row">
+      <label class="field"><span>Root</span><select id="tkRoot"></select></label>
+      <label class="field"><span>Scale</span><select id="tkType"></select></label>
+      <button class="btn btn-primary btn-sm" id="tkPlay">Play it</button>
+    </div>
+    <p class="tool-read"><strong id="tkName">C major</strong><span id="tkNotes"></span></p>
+    <div class="keybed short"><div class="keys" id="tkKeys" role="img" aria-label="Scale on a keyboard"></div></div>
+    <p class="score-note" id="tkWhy"></p>
+    </div>
+  </div>
+</section>
+
+<section id="more">
+  <div class="wrap">
+    <p class="eyebrow">More tools</p>
+    <h2>Everything else here is free too</h2>
+    <div class="grid" style="gap:12px">
+      <a class="piece" href="/online-piano-metronome.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Online metronome for piano</span><br><span class="piece-c">A free metronome from 30 to 220 BPM with tap tempo, beat lights and adjustable beats per</span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+      <a class="piece" href="/tap-tempo-calculator.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Tap tempo calculator</span><br><span class="piece-c">Tap in time with any music and this tool tells you the tempo in beats per minute. Free, </span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+      <a class="piece" href="/piano-note-trainer.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Piano note trainer</span><br><span class="piece-c">It names a note and you find it on the keyboard. Ten minutes a day and the keys stop nee</span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+      <a class="piece" href="/piano-sight-reading-trainer.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Piano sight reading trainer</span><br><span class="piece-c">A note appears on the stave and you play it. Treble, bass or both, with or without sharp</span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+      <a class="piece" href="/piano-practice-timer.html"><span class="piece-lvl">&#9834;</span>
+        <span><span class="piece-t">Piano practice timer</span><br><span class="piece-c">Time your practice, save the minutes and build a streak. Kept privately in your own brow</span></span>
+        <span class="piece-go">Open &rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+
+<section id="faq">
+  <div class="wrap" style="max-width:820px">
+    <p class="eyebrow">Questions</p>
+    <h2>Common questions</h2>
+    <div style="margin-top:24px">
+      <details class="faq"><summary>Which scale should I learn first?</summary>
+        <p>C major, because it uses only white keys and lets you focus on fingering rather than on where the black notes are.</p>
+      </details>
+      <details class="faq"><summary>Why is F major spelled with B flat rather than A sharp?</summary>
+        <p>Because a scale uses each letter once and in order. Calling it A sharp would use A twice and skip B entirely.</p>
+      </details>
+      <details class="faq"><summary>What is the fingering for a major scale?</summary>
+        <p>Usually 1 2 3 1 2 3 4 5 in the right hand, tucking the thumb under after the third note.</p>
+      </details>
+    </div>
+  </div>
+</section>
 </main>
 
 <footer class="site-foot">
@@ -187,6 +226,7 @@
 <script src="/assets/engine.js?v=13"></script>
 <script src="/assets/gate.js?v=13"></script>
 <script src="/assets/site.js?v=13"></script>
+<script src="/assets/toolkit.js?v=13"></script>
 
 <script type="application/ld+json">
 {
@@ -218,10 +258,10 @@
     },
     {
       "@type": "WebPage",
-      "@id": "https://learnpianokeys.com/terms.html#webpage",
-      "url": "https://learnpianokeys.com/terms.html",
-      "name": "Terms of Use",
-      "description": "Terms of use for Learn Piano Keys, a free browser piano practice tool.",
+      "@id": "https://learnpianokeys.com/piano-scale-finder.html#webpage",
+      "url": "https://learnpianokeys.com/piano-scale-finder.html",
+      "name": "Piano Scale Finder: Notes and Fingering",
+      "description": "See any scale drawn on a keyboard with the correct spelling and fingering, and hear it played. Ten scale types, every key.",
       "isPartOf": {
         "@id": "https://learnpianokeys.com/#website"
       },
@@ -229,15 +269,15 @@
         "@id": "https://learnpianokeys.com/#org"
       },
       "inLanguage": "en-GB",
-      "datePublished": "2026-07-18",
+      "datePublished": "2026-07-20",
       "dateModified": "2026-07-21",
       "isAccessibleForFree": true,
       "primaryImageOfPage": {
         "@type": "ImageObject",
-        "url": "https://learnpianokeys.com/og-terms.png",
+        "url": "https://learnpianokeys.com/og-piano-scale-finder.png",
         "width": 1200,
         "height": 630,
-        "caption": "Terms of use for Learn Piano Keys"
+        "caption": "Piano scale finder, a free tool on Learn Piano Keys"
       },
       "author": {
         "@id": "https://learnpianokeys.com/#org"
@@ -246,12 +286,19 @@
         "@id": "https://learnpianokeys.com/#org"
       },
       "breadcrumb": {
-        "@id": "https://learnpianokeys.com/terms.html#breadcrumb"
+        "@id": "https://learnpianokeys.com/piano-scale-finder.html#breadcrumb"
+      },
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [
+          "h1",
+          ".answer-first"
+        ]
       }
     },
     {
       "@type": "BreadcrumbList",
-      "@id": "https://learnpianokeys.com/terms.html#breadcrumb",
+      "@id": "https://learnpianokeys.com/piano-scale-finder.html#breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
@@ -262,8 +309,55 @@
         {
           "@type": "ListItem",
           "position": 2,
-          "name": "Terms",
-          "item": "https://learnpianokeys.com/terms.html"
+          "name": "Tools",
+          "item": "https://learnpianokeys.com/tools.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Piano scale finder",
+          "item": "https://learnpianokeys.com/piano-scale-finder.html"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://learnpianokeys.com/piano-scale-finder.html#faq",
+      "mainEntityOfPage": {
+        "@id": "https://learnpianokeys.com/piano-scale-finder.html#webpage"
+      },
+      "inLanguage": "en-GB",
+      "isAccessibleForFree": true,
+      "author": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "publisher": {
+        "@id": "https://learnpianokeys.com/#org"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Which scale should I learn first?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "C major, because it uses only white keys and lets you focus on fingering rather than on where the black notes are."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is F major spelled with B flat rather than A sharp?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Because a scale uses each letter once and in order. Calling it A sharp would use A twice and skip B entirely."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the fingering for a major scale?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Usually 1 2 3 1 2 3 4 5 in the right hand, tucking the thumb under after the third note."
+          }
         }
       ]
     }
