@@ -83,7 +83,7 @@
     kb.keys.forEach(function (elKey, midi) {
       var old = elKey.querySelector('.kn, .kf');
       if (old) old.remove();
-      elKey.classList.remove('target', 'lit');
+      elKey.classList.remove('target', 't-r', 'lit');
       if (isBlack(midi)) return;
       if (hint === 'labelC' && midi === 60) add(elKey, 'kn', 'C');
       if (hint === 'names') add(elKey, 'kn', pitchClass(midi));
@@ -100,10 +100,10 @@
   }
 
   function markTarget() {
-    kb.keys.forEach(function (k) { k.classList.remove('target'); });
+    kb.keys.forEach(function (k) { k.classList.remove('target', 't-r'); });
     var step = STEPS[idx];
     var want = step.mode === 'single' ? step.targets[0] : step.targets[progress];
-    if (want !== undefined && kb.keys.has(want)) kb.keys.get(want).classList.add('target');
+    if (want !== undefined && kb.keys.has(want)) kb.keys.get(want).classList.add('target', 't-r');
   }
 
   function render() {
@@ -132,7 +132,7 @@
     elFb.textContent = msg;
     elFb.className = 'step-feedback ok';
     btnNext.disabled = false;
-    kb.keys.forEach(function (k) { k.classList.remove('target'); });
+    kb.keys.forEach(function (k) { k.classList.remove('target', 't-r'); });
     LPK.markDay();
     var s = LPK.load();
     s.lessonStep = Math.max(s.lessonStep || 0, idx + 1);
@@ -275,9 +275,21 @@
     window.scrollTo({ top: card.offsetTop - 90, behavior: 'smooth' });
   });
 
+  var resumeBox = document.getElementById('lessonResume');
+  document.getElementById('lessonFresh').addEventListener('click', function () {
+    var st = LPK.load(); st.lessonDone = false; st.lessonStep = 0; LPK.save(st);
+    idx = 0; progress = 0;
+    if (resumeBox) resumeBox.hidden = true;
+    card.hidden = false; dots.hidden = false; doneBox.hidden = true;
+    render();
+    elFb.textContent = 'Starting from step 1.';
+    elFb.className = 'step-feedback';
+  });
+
   render();
   if (idx > 0) {
     elFb.textContent = 'Carried on from where you stopped last time.';
     elFb.className = 'step-feedback';
+    if (resumeBox) resumeBox.hidden = false;
   }
 })();

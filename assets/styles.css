@@ -215,17 +215,19 @@ main.narrow h2 { font-size: 1.25rem; font-family: var(--body); font-weight: 600;
 .bkey.on { background: linear-gradient(180deg,#6A5326 0%, #3A2C13 100%); transform: scaleY(.985); }
 .wkey.lh.on, .bkey.lh.on { background: linear-gradient(180deg,#C6E5F5 0%, #6FB6DC 100%); }
 .wkey.rh.on, .bkey.rh.on { background: linear-gradient(180deg,#F2BDB9 0%, #D96E68 100%); }
-.wkey.target, .bkey.target { animation: target 1.1s ease-in-out infinite; }
+.wkey.target, .bkey.target { --tg: var(--brass); animation: target 1.1s ease-in-out infinite; }
+.wkey.target.t-l, .bkey.target.t-l { --tg: var(--hand-l); }
+.wkey.target.t-r, .bkey.target.t-r { --tg: var(--hand-r); }
 @keyframes target {
-  0%, 100% { box-shadow: inset 0 0 0 2px var(--brass); }
-  50% { box-shadow: inset 0 0 0 5px var(--brass); }
+  0%, 100% { box-shadow: inset 0 0 0 3px var(--tg), 0 0 10px 2px var(--tg); }
+  50% { box-shadow: inset 0 0 0 6px var(--tg), 0 0 22px 7px var(--tg); }
 }
 .wkey.lit { background: linear-gradient(180deg,#FFF0C8 0%, #EBD79C 100%); }
 .bkey.lit { background: linear-gradient(180deg,#7A5F26 0%, #4A3812 100%); }
 .wkey.middle-c { box-shadow: inset 0 -6px 8px -6px rgba(0,0,0,.35), inset 0 0 0 2px rgba(212,163,67,.5); }
 .wkey .kn {
   position: absolute; bottom: 8px; left: 0; right: 0; text-align: center;
-  font-family: var(--mono); font-size: .62rem; color: #9C907F; pointer-events: none;
+  font-family: var(--mono); font-size: .7rem; font-weight: 700; color: #1E1712; pointer-events: none;
 }
 .wkey .kf {
   position: absolute; bottom: 26px; left: 0; right: 0; text-align: center;
@@ -370,6 +372,77 @@ body.wide main { max-width: 1180px; margin: 0 auto; }
 }
 .badge.ok { color: var(--good); box-shadow: inset 0 0 0 1px rgba(127,168,111,.35); }
 .badge.warn { color: var(--brass); box-shadow: inset 0 0 0 1px rgba(212,163,67,.3); }
+
+/* Status badges carry a small light: they report state rather than invite a click. */
+.badge.status { position: relative; padding-left: 24px; }
+.badge.status::before {
+  content: ''; position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 7px; height: 7px; border-radius: 50%; background: var(--ivory-3);
+}
+.badge.status.ok::before { background: var(--good); }
+.badge.status.warn::before { background: var(--brass); }
+button.badge { border: 0; cursor: pointer; font: inherit; font-family: var(--mono); font-size: .7rem; letter-spacing: .08em; line-height: inherit; }
+button.badge:hover { box-shadow: inset 0 0 0 1px rgba(244,237,226,.25); }
+
+/* The quiet session clock, and the way out of a session. */
+.badge.sess { font-variant-numeric: tabular-nums; }
+.badge.sess.paused { opacity: .55; }
+.badge.sess-finish { background: var(--brass); color: var(--brass-ink); }
+.badge.sess-finish:hover { box-shadow: none; filter: brightness(1.06); }
+
+/* Resume strip and start afresh. */
+.resume-strip {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--ink-2); border: 1px solid var(--ink-4); border-radius: 12px;
+  padding: 10px 16px; margin: 0 0 16px; flex-wrap: wrap;
+  font-size: .9rem; color: var(--ivory-2);
+}
+
+/* Piece switcher cards in the practice room. */
+.piece-cards { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 18px; }
+.piece-card {
+  background: var(--ink-2); border: 1px solid var(--ink-4); border-radius: 10px;
+  padding: 8px 12px; cursor: pointer; text-align: left; color: var(--ivory-2);
+  font-family: var(--body); font-size: .78rem; line-height: 1.3;
+  transition: border-color .12s linear, color .12s linear;
+}
+.piece-card b { display: block; color: var(--ivory); font-weight: 600; }
+.piece-card span { font-family: var(--mono); font-size: .62rem; letter-spacing: .06em; }
+.piece-card:hover { border-color: var(--brass-dim); }
+.piece-card.active { border-color: var(--brass); color: var(--ivory); box-shadow: inset 0 0 0 1px var(--brass); }
+
+/* Progress page: chart, ranges, score bars. */
+.range-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0 16px; }
+.range-custom { display: inline-flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: .78rem; color: var(--ivory-2); }
+.range-custom input[type="date"] {
+  background: var(--ink-3); border: 1px solid var(--ink-4); border-radius: 8px;
+  color: var(--ivory); font-family: var(--mono); font-size: .72rem; padding: 6px 8px;
+  color-scheme: dark;
+}
+.chart-wrap { width: 100%; }
+.chart-wrap canvas { display: block; width: 100%; }
+.best-block { padding: 14px 0; border-bottom: 1px solid var(--ink-3); }
+.best-block:last-child { border-bottom: 0; }
+.best-block b { display: block; margin-bottom: 8px; font-family: var(--display); font-weight: 500; font-size: 1.05rem; }
+.score-line { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
+.score-lab { flex: 0 0 84px; font-family: var(--mono); font-size: .64rem; letter-spacing: .06em; color: var(--ivory-2); }
+.score-bar { flex: 1; height: 8px; background: var(--ink-3); border-radius: 999px; overflow: hidden; }
+.score-bar i { display: block; height: 100%; border-radius: 999px; }
+.score-bar .sb-acc { background: var(--good); }
+.score-bar .sb-tim { background: var(--hand-l); }
+.score-bar .sb-lit { background: var(--brass); color: var(--brass-ink); }
+.score-pct { flex: 0 0 56px; text-align: right; font-family: var(--mono); font-size: .66rem; color: var(--ivory-2); }
+
+/* End of session wrap-up card. */
+.sess-done { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(10,8,7,.72); }
+.sess-done[hidden] { display: none; }
+.sess-card { background: var(--ink-2); border: 1px solid var(--ink-4); border-radius: 16px; padding: 30px 28px; max-width: 460px; width: 100%; box-shadow: var(--shadow); text-align: center; }
+.sess-card h2 { font-family: var(--display); font-size: 1.7rem; margin: 0 0 6px; }
+.sess-stats { display: flex; justify-content: center; gap: 26px; margin: 18px 0 6px; }
+.sess-stats div { font-family: var(--mono); font-size: .68rem; letter-spacing: .08em; color: var(--ivory-2); }
+.sess-stats b { display: block; font-family: var(--display); font-size: 1.6rem; letter-spacing: 0; color: var(--ivory); margin-bottom: 4px; }
+.sess-moti { font-size: .95rem; color: var(--ivory); margin: 14px 0 20px; }
+.sess-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
 .instrument { background: var(--ink-2); border: 1px solid var(--ink-3); border-radius: 14px; overflow: hidden; position: relative; }
 .staff-wrap { padding: 14px 0 4px; border-bottom: 1px solid var(--ink-3); background: var(--ink); }
@@ -766,3 +839,17 @@ kbd {
   #trainerStave { height: 155px; }
   .answer-first { font-size: 1.05rem; }
 }
+
+/* ---- v11: circle of fifths ---- */
+.fifths { position: relative; width: 100%; max-width: 340px; margin: 0 auto 18px; aspect-ratio: 1; }
+.fifth-key {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 46px; height: 46px; border-radius: 50%;
+  background: var(--ink-3); border: 1px solid var(--ink-4); color: var(--ivory-2);
+  font: inherit; font-size: .88rem; font-weight: 600; cursor: pointer;
+  transition: all .16s var(--ease);
+}
+.fifth-key:hover { border-color: var(--ivory-3); color: var(--ivory); }
+.fifth-key.on { background: var(--brass); border-color: var(--brass); color: var(--brass-ink); }
+#tkStave { width: 100%; height: 150px; display: block; margin: 6px 0 14px; }
+@media (max-width: 560px) { .fifths { max-width: 270px; } .fifth-key { width: 38px; height: 38px; font-size: .78rem; } }

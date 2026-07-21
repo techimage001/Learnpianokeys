@@ -35,11 +35,20 @@
       <div class="stage-meta" id="pieceMeta"></div>
     </div>
     <div class="picker">
-      <span class="badge" id="midiBadge">Checking for MIDI…</span>
-      <span class="badge" id="micBadge">Microphone off</span>
+      <span class="badge status" id="midiBadge">Checking for MIDI…</span>
+      <button type="button" class="badge status" id="micBadge" aria-pressed="false" title="Turn the microphone on or off">Microphone off</button>
+      <span class="badge sess" id="sessTime" title="Time practised this visit. It pauses by itself when you step away." hidden>0:00</span>
+      <button type="button" class="badge sess-finish" id="sessFinish" hidden>Finish session</button>
       <select id="pieceSel" aria-label="Choose a piece"></select>
     </div>
   </div>
+
+  <div class="resume-strip" id="resumeStrip" hidden>
+    <span>Picked up where you left off.</span>
+    <button type="button" class="pill" id="freshBtn">Start afresh</button>
+  </div>
+
+  <div class="piece-cards" id="pieceCards" role="group" aria-label="Choose a piece"></div>
 
   <div class="layout">
     <div>
@@ -84,6 +93,12 @@
         </div>
         <div class="spacer"></div>
         <div class="pill-row">
+          <span class="label">Level</span>
+          <button class="pill" data-level="1" aria-pressed="false">1 One hand</button>
+          <button class="pill" data-level="2" aria-pressed="false">2 Add bass</button>
+          <button class="pill active" data-level="3" aria-pressed="true">3 Both hands</button>
+        </div>
+        <div class="pill-row">
           <span class="label">Hands</span>
           <button class="pill active" data-hand="both" aria-pressed="true">Both</button>
           <button class="pill" data-hand="l" aria-pressed="false">Left</button>
@@ -124,13 +139,11 @@
         <div class="pill-row">
           <button class="pill" id="takeBtn">Hear your take</button>
           <button class="pill" id="takeRefBtn">Take against the reference</button>
-          <button class="pill" id="printBtn">Sheet music</button>
-          <button class="pill" id="shareScoreBtn">Share the sheet music</button>
           <button class="pill" id="shareLinkBtn">Share the link</button>
         </div>
         <p class="score-note" style="margin-top:14px">
           Hearing your own timing back is the fastest way to fix it. Your playing is replayed from your device only; nothing is uploaded.
-          Sharing an image and sharing a link are separate buttons on purpose: when a picture is attached, some messaging apps drop the text, so the link would never arrive.
+          Everything stays inside the app: nothing is downloaded, and your place is kept for you so you can stop and carry on later.
         </p>
       </div>
     </div>

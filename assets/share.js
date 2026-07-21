@@ -1,7 +1,7 @@
 /* Learn Piano Keys - sharing helpers.
-   Honest about the platform limits rather than papering over them:
-   a picture and a link are separate actions because messaging apps
-   drop the caption when a file is attached. */
+   Links only. Nothing on this site is downloadable: every arrangement,
+   diagram and score stays inside the app, and the learner's place is kept
+   for them instead. */
 
 var LPKShare = (function () {
   function toast(msg) {
@@ -11,33 +11,6 @@ var LPKShare = (function () {
     h.classList.add('show');
     clearTimeout(h._t);
     h._t = setTimeout(function () { h.classList.remove('show'); }, 2400);
-  }
-
-  function dataUrlToFile(dataUrl, name) {
-    var parts = dataUrl.split(',');
-    var mime = parts[0].match(/:(.*?);/)[1];
-    var bin = atob(parts[1]);
-    var arr = new Uint8Array(bin.length);
-    for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-    return new File([arr], name, { type: mime });
-  }
-
-  async function shareImage(dataUrl, filename, title, text) {
-    var file;
-    try { file = dataUrlToFile(dataUrl, filename); } catch (e) { file = null; }
-    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: title, text: text });
-        return true;
-      } catch (e) {
-        if (e && e.name === 'AbortError') return false;
-      }
-    }
-    var a = document.createElement('a');
-    a.href = dataUrl; a.download = filename;
-    document.body.appendChild(a); a.click(); a.remove();
-    toast('Your browser cannot share files, so it has been downloaded instead.');
-    return false;
   }
 
   async function shareLink(url, title, text) {
@@ -55,5 +28,5 @@ var LPKShare = (function () {
     }
   }
 
-  return { shareImage: shareImage, shareLink: shareLink, toast: toast };
+  return { shareLink: shareLink, toast: toast };
 })();

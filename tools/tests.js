@@ -94,6 +94,122 @@ pages.forEach(p => {
   ok(!!wp.speakable, 'reading page marks its answer paragraphs as speakable');
 }
 
+/* ---- 1c. metadata limits and uniqueness ---- */
+head('metadata limits');
+{
+  const descs = [];
+  pages.forEach(p => {
+    const t = (docs[p].match(/<title>([^<]*)<\/title>/) || [''])[1];
+    const d = (docs[p].match(/<meta name="description" content="([^"]*)"/) || [''])[1];
+    ok(t.length <= 60, `${p}: title within 60 characters (${t.length})`);
+    ok(d.length <= 150, `${p}: description within 150 characters (${d.length})`);
+    ok(d.length >= 60, `${p}: description is substantial (${d.length})`);
+    descs.push({ p, d });
+  });
+  /* Near-duplicate descriptions are the classic failure of a bulk build, so
+     this is measured rather than assumed. Two ceilings, on purpose:
+
+     Prose pages get 0.72. Two hand-written guides scoring above that are
+     saying the same thing twice and one of them should not exist.
+
+     Computed reference pages get 0.88, because the similarity there is a
+     fact about music rather than laziness. A major and D major genuinely
+     use the same seven letters and the same fingering; a dictionary's
+     entries for two near-synonyms would score just as high. Forcing them
+     apart would mean writing something less true to satisfy a number. */
+  const words = s2 => new Set(s2.toLowerCase().replace(/[^a-z0-9# ]/g, '').split(/\s+/).filter(Boolean));
+  const computed = p2 => /-chord-piano\.html$|-scale-piano\.html$/.test(p2);
+  let worstProse = 0, prosePair = '', worstRef = 0, refPair = '';
+  for (let i = 0; i < descs.length; i++) {
+    for (let j = i + 1; j < descs.length; j++) {
+      const a = words(descs[i].d), b = words(descs[j].d);
+      const inter = [...a].filter(w => b.has(w)).length;
+      const jac = inter / (a.size + b.size - inter);
+      const bothComputed = computed(descs[i].p) && computed(descs[j].p);
+      if (bothComputed) {
+        if (jac > worstRef) { worstRef = jac; refPair = `${descs[i].p} vs ${descs[j].p}`; }
+      } else if (jac > worstProse) { worstProse = jac; prosePair = `${descs[i].p} vs ${descs[j].p}`; }
+    }
+  }
+  ok(worstProse <= 0.72, `prose descriptions distinct (worst ${worstProse.toFixed(2)}, ${prosePair})`);
+  ok(worstRef <= 0.88, `reference descriptions distinct (worst ${worstRef.toFixed(2)}, ${refPair})`);
+}
+
+/* ---- 1d. the generated families ---- */
+head('generated content');
+{
+  const songs = pages.filter(p => /-piano-notes\.html$/.test(p));
+  const chords = pages.filter(p => /-chord-piano\.html$/.test(p));
+  const scales = pages.filter(p => /-scale-piano\.html$/.test(p));
+  ok(songs.length >= 8, `song pages generated (${songs.length})`);
+  ok(chords.length === 12, `chord pages generated (${chords.length})`);
+  ok(scales.length === 12, `scale pages generated (${scales.length})`);
+  [...songs, ...chords, ...scales].forEach(p => {
+    ok(/class="answer-first"/.test(docs[p]), `${p}: opens with an answer paragraph`);
+    ok(/class="keys"/.test(docs[p]), `${p}: carries a real playable keyboard`);
+    ok(/assets\/pagekit\.js/.test(docs[p]), `${p}: loads the interaction script`);
+  });
+  songs.forEach(p => {
+    ok(/public-domain-policy/.test(docs[p]), `${p}: links to the provenance policy`);
+    ok(/Why this piece is free/.test(docs[p]), `${p}: states why it is out of copyright`);
+    ok(/level=1/.test(docs[p]) && /level=3/.test(docs[p]), `${p}: offers all three levels`);
+  });
+  // correct enharmonic spelling: no sharp names in flat keys
+  ok(!/F major scale is [^<]*A#/.test(docs['f-major-scale-piano.html']), 'F major spells B flat, not A sharp');
+  ok(/Eb/.test(docs['c-minor-chord-piano.html']), 'C minor spells E flat');
+  ok(/Bb/.test(docs['g-minor-chord-piano.html']), 'G minor spells B flat');
+}
+
+head('guides and tool pages');
+{
+  const guides = require('../data/guides.js');
+  const toolp = require('../data/toolpages.js');
+  ok(guides.length === 20, `20 educational guides (${guides.length})`);
+  ok(toolp.length === 10, `10 dedicated tool pages (${toolp.length})`);
+  guides.forEach(g => {
+    const d = docs[g.slug + '.html'];
+    ok(!!d, `guide exists: ${g.slug}`);
+    if (!d) return;
+    ok((d.match(/class="answer-first"/g) || []).length >= 5, `${g.slug}: answer paragraph per section`);
+    ok(/id="guideKeys"/.test(d), `${g.slug}: carries a playable keyboard`);
+    ok((d.match(/<summary>/g) || []).length >= 3, `${g.slug}: has real questions`);
+    ok(/assets\/toolkit\.js/.test(d), `${g.slug}: loads the interaction script`);
+    const words = g.answer.split(/\s+/).length;
+    ok(words >= 40 && words <= 90, `${g.slug}: answer is extractable length (${words} words)`);
+  });
+  toolp.forEach(t => {
+    const d = docs[t.slug + '.html'];
+    ok(!!d, `tool page exists: ${t.slug}`);
+    if (!d) return;
+    ok(new RegExp('data-tool="' + t.tool + '"').test(d), `${t.slug}: holds the real tool, not a link`);
+    ok(/assets\/toolkit\.js/.test(d), `${t.slug}: loads the tool script`);
+    ok((d.match(/<summary>/g) || []).length >= 3, `${t.slug}: has real questions`);
+  });
+  // every guide must be reachable from a hub or another guide
+  guides.concat(toolp).forEach(g => {
+    const linked = pages.some(p2 => p2 !== g.slug + '.html' && new RegExp('href="/' + g.slug + '\\.html').test(docs[p2]));
+    ok(linked, `${g.slug}: linked from at least one other page`);
+  });
+}
+
+head('public domain policy');
+{
+  const pol = docs['public-domain-policy.html'];
+  ok(!!pol, 'policy page exists');
+  ok(/died before 1900/.test(pol), 'states the conservative rule');
+  ok((pol.match(/<tr><td><a href="\//g) || []).length >= 8, 'lists every piece');
+  ok(/we will take the material down/.test(pol), 'carries a notice and takedown commitment');
+  ok(/not legal advice/.test(pol), 'does not present itself as legal advice');
+}
+
+head('no downloads');
+pages.forEach(p => {
+  ok(!/download=|toDataURL|Print or save as PDF/.test(docs[p]), `${p}: offers no file download`);
+});
+ok(!/shareImage/.test(fs.readFileSync(path.join(ROOT, 'assets/share.js'), 'utf8')),
+  'file sharing removed, link sharing kept');
+ok(!/printBtn/.test(docs['app.html']), 'no print button in the practice room');
+
 /* ---- 2. favicon set on every page family ---- */
 head('favicons');
 ['favicon.svg', 'favicon-48.png', 'favicon-96.png', 'favicon-192.png', 'favicon.ico', 'apple-touch-icon.png', 'site.webmanifest']

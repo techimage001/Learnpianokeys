@@ -189,9 +189,18 @@ head('practice tracker');
 {
   const { doc, errors } = booted['practice.html'];
   ok(errors.length === 0, 'no errors during boot');
-  ok(doc.getElementById('timerClock').textContent === '00:00', 'timer starts at zero');
-  ok(doc.getElementById('heat').children.length === 14, 'fourteen day chart drawn');
+  ok(doc.getElementById('timerClock').textContent === '00:00', 'away-from-app timer starts at zero');
+  ok(!!doc.getElementById('progChart'), 'minutes chart canvas present');
+  ok(doc.querySelectorAll('[data-range]').length === 4, 'four range buttons present');
+  ['60', '90', 'all', '30'].forEach(mode => {
+    doc.querySelector(`[data-range="${mode}"]`).click();
+    ok(doc.querySelector(`[data-range="${mode}"]`).getAttribute('aria-pressed') === 'true',
+      `range button ${mode} takes the selection`);
+  });
+  ok(/land here on their own|minutes over/.test(doc.getElementById('progNote').textContent),
+    'chart note painted for the current range');
   ok(doc.getElementById('bestList').innerHTML.trim().length > 10, 'best scores panel has its empty state');
+  ok(!!doc.getElementById('rangeFrom') && !!doc.getElementById('rangeTo'), 'custom date pickers present');
 }
 
 /* ---------- the reading page builds itself ---------- */

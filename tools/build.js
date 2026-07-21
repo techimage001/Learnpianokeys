@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ASSET_V = '10';
+const ASSET_V = '13';
 const SITE = 'https://learnpianokeys.com';
 const AUTHOR = 'Learn Piano Keys';
 const BUILT = new Date().toISOString().slice(0, 10);
@@ -31,6 +31,54 @@ const VERIFY = {
   'p:domain_verify':          ''    // Pinterest
 };
 const ROOT = path.join(__dirname, '..');
+const gen = require('./gen-content.js');
+const tpl = require('./templates.js');
+const tpl2 = require('./templates2.js');
+const GUIDES = require('../data/guides.js');
+const TOOLPAGES = require('../data/toolpages.js');
+gen.emitRuntime();
+
+const SONGS  = gen.songPages();
+const CHORDS = gen.chordPages();
+const SCALES = gen.scalePages();
+
+/* Which notes each melody uses, stated in words for the answer paragraph. */
+const PC = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+SONGS.forEach(sp => {
+  const used = [...new Set(sp.piece.notes.filter(n => n.h === 'r').map(n => PC[n.m % 12]))];
+  const order = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  used.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  sp.noteSummary = used.length + ' different notes: ' + used.join(', ');
+});
+
+/* Hubs, the policy page and every generated family, added to the page list. */
+const GENERATED = []
+  .concat(SONGS.map(x  => ({ slug: x.slug, url: '/' + x.slug + '.html', title: x.title, desc: x.desc,
+      scripts: ['pieces','engine','gate','site','pagekit'], crumbs: [['Songs','/songs.html'],[x.piece.title,'/' + x.slug + '.html']],
+      published: '2026-07-20', ogAlt: x.piece.title + ' piano notes for beginners',
+      body: tpl.songBody(x, SONGS), speakable: true, faqFrom: x })))
+  .concat(CHORDS.map(x => ({ slug: x.slug, url: '/' + x.slug + '.html', title: x.title, desc: x.desc,
+      scripts: ['engine','gate','site','pagekit'], crumbs: [['Chords','/chords.html'],[x.root + ' ' + x.type,'/' + x.slug + '.html']],
+      published: '2026-07-20', ogAlt: x.root + ' ' + x.type + ' chord shown on a piano keyboard',
+      body: tpl.chordBody(x, CHORDS), speakable: true })))
+  .concat(SCALES.map(x => ({ slug: x.slug, url: '/' + x.slug + '.html', title: x.title, desc: x.desc,
+      scripts: ['engine','gate','site','pagekit'], crumbs: [['Scales','/scales.html'],[x.root + ' ' + x.type,'/' + x.slug + '.html']],
+      published: '2026-07-20', ogAlt: x.root + ' ' + x.type + ' scale shown on a piano keyboard',
+      body: tpl.scaleBody(x, SCALES), speakable: true })))
+  .concat(GUIDES.map(x => ({ slug: x.slug, url: '/' + x.slug + '.html', title: x.title, desc: x.desc,
+      scripts: ['engine','gate','site','toolkit'], crumbs: [[x.hub, hubUrl(x.hub)], [x.h1, '/' + x.slug + '.html']],
+      published: '2026-07-20', ogAlt: x.h1 + ' for beginners on Learn Piano Keys',
+      body: tpl2.guideBody(x, GUIDES), speakable: true })))
+  .concat(TOOLPAGES.map(x => ({ slug: x.slug, url: '/' + x.slug + '.html', title: x.title, desc: x.desc,
+      scripts: ['engine','gate','site','toolkit'], crumbs: [['Tools','/tools.html'], [x.h1, '/' + x.slug + '.html']],
+      published: '2026-07-20', ogAlt: x.h1 + ', a free tool on Learn Piano Keys',
+      body: tpl2.toolBody(x, TOOLPAGES), speakable: true })));
+
+function hubUrl(hub) {
+  return { 'Start learning': '/piano-keys-for-beginners.html', 'Read music': '/how-to-read-music.html',
+           'Chords': '/chords.html', 'Scales': '/scales.html', 'Practice': '/practice.html' }[hub] || '/';
+}
+
 
 const PAGES = [
   {
@@ -38,8 +86,8 @@ const PAGES = [
     url: '/',
     published: '2026-07-18',
     ogAlt: 'Learn Piano Keys: a free browser piano practice room, shown with a piano keybed',
-    title: 'Learn Piano Keys · Free piano lessons, tools and practice room',
-    desc: 'Learn the piano keys from scratch, then practise real pieces with wait mode, looping, hand separation, fingering and a grand staff. Works with a MIDI keyboard, a microphone or your computer keys.',
+    title: 'Learn Piano Keys: Free Lessons, Tools and Practice Room',
+    desc: 'Learn the piano keys from scratch, then practise real pieces with fingering, three levels and music that waits for you. Free, no card.',
     scripts: ['engine', 'gate', 'site', 'tracker'],
     crumbs: []
   },
@@ -48,9 +96,9 @@ const PAGES = [
     url: '/piano-keys-for-beginners.html',
     published: '2026-07-19',
     ogAlt: 'Your first five minutes at the piano: a six step beginner walkthrough',
-    title: 'Piano Keys for Beginners · Your first five minutes at the keyboard',
-    desc: 'Never touched a piano? Six short steps, one octave, no jargon. Find middle C, name the white keys, put five fingers down and play your first real tune in about five minutes.',
-    scripts: ['engine', 'gate', 'site', 'lesson'],
+    title: 'Piano Keys for Beginners: Your First Five Minutes',
+    desc: 'Never touched a piano? Six short steps, one octave, no jargon. Find middle C and play a real tune in about five minutes. Free.',
+    scripts: ['engine', 'gate', 'site', 'session', 'lesson'],
     crumbs: [['Lessons', '/#paths'], ['Piano keys for beginners', '/piano-keys-for-beginners.html']]
   },
   {
@@ -58,8 +106,8 @@ const PAGES = [
     url: '/how-to-read-music.html',
     published: '2026-07-19',
     ogAlt: 'How to read music: the treble and bass clef explained with playable diagrams',
-    title: 'How to Read Music Notes · Free interactive lessons and note trainer',
-    desc: 'Learn to read the treble and bass clef with playable diagrams, then practise with a free note trainer that shows a note and waits for you to play it. Works with a MIDI keyboard, mouse or computer keys.',
+    title: 'How to Read Music Notes: Free Interactive Guide',
+    desc: 'Learn the treble and bass clef with playable diagrams, then practise on a note trainer that waits for you to play what you see.',
     scripts: ['engine', 'gate', 'site', 'reading'],
     speakable: true,
     crumbs: [['How to read music', '/how-to-read-music.html']]
@@ -69,8 +117,8 @@ const PAGES = [
     url: '/tools.html',
     published: '2026-07-19',
     ogAlt: 'Free piano tools: chord finder, scale explorer, metronome and note quiz',
-    title: 'Free Piano Tools · Chord finder, scale explorer, metronome and note quiz',
-    desc: 'Four practice tools that run entirely in your browser. Find any chord, see any scale on the keyboard, keep time with a tap-tempo metronome and test how fast you can name a key.',
+    title: 'Free Piano Tools: Chords, Scales, Metronome, Quiz',
+    desc: 'Four practice tools that run in your browser. Find any chord, see any scale, keep time with a tap tempo metronome, test your notes.',
     scripts: ['engine', 'gate', 'site', 'tools'],
     crumbs: [['Tools', '/tools.html']]
   },
@@ -78,38 +126,58 @@ const PAGES = [
     slug: 'practice',
     url: '/practice.html',
     published: '2026-07-19',
-    ogAlt: 'Practice tracker: a timer and streak kept in your own browser',
-    title: 'Practice Tracker · Time your sessions and build a streak',
-    desc: 'A practice timer and streak tracker that keeps everything in your own browser rather than on a server. Nothing to install and nothing uploaded.',
+    ogAlt: 'Your piano practice progress: minutes, streaks and scores kept in your own browser',
+    title: 'Piano Practice Progress: Minutes, Streaks and Scores',
+    desc: 'Your practice minutes, streaks and best scores, charted over any date range and kept in your own browser rather than on a server. Nothing uploaded.',
     scripts: ['engine', 'gate', 'site', 'tracker'],
-    crumbs: [['Practice tracker', '/practice.html']]
+    crumbs: [['Progress', '/practice.html']]
   },
   {
     slug: 'app',
     url: '/app.html',
     published: '2026-07-18',
     ogAlt: 'The Learn Piano Keys practice room, with falling notes above a piano keybed',
-    title: 'Practice room · Learn Piano Keys',
+    title: 'Practice Room: Play a Real Piece',
     desc: 'Practise real pieces with wait mode, section looping, hand separation, tempo, transpose, count-in, sustain pedal and a grand staff.',
-    scripts: ['pieces', 'engine', 'gate', 'site', 'share', 'app'],
+    scripts: ['pieces', 'engine', 'gate', 'site', 'share', 'session', 'app'],
     crumbs: [['Practice room', '/app.html']],
     noindex: true,
     wide: true
   },
+  { slug: 'songs', url: '/songs.html', published: '2026-07-20',
+    ogAlt: 'Free piano songs for beginners with notes and fingering',
+    title: 'Easy Piano Songs for Beginners: Notes and Fingering',
+    desc: 'Free piano notes for easy beginner songs. Three levels each, fingering on every note, and the music waits for you.',
+    scripts: ['engine','gate','site'], crumbs: [['Songs','/songs.html']] },
+  { slug: 'chords', url: '/chords.html', published: '2026-07-20',
+    ogAlt: 'Piano chords for beginners shown on a keyboard',
+    title: 'Piano Chords for Beginners: Major and Minor',
+    desc: 'Every beginner piano chord with the notes, the fingering and a keyboard diagram you can hear. Free, nothing to install.',
+    scripts: ['engine','gate','site'], crumbs: [['Chords','/chords.html']] },
+  { slug: 'scales', url: '/scales.html', published: '2026-07-20',
+    ogAlt: 'Piano scales for beginners shown on a keyboard',
+    title: 'Piano Scales for Beginners: Notes and Fingering',
+    desc: 'Piano scales with the correct notes, standard fingering and a keyboard you can hear. Start with C major.',
+    scripts: ['engine','gate','site'], crumbs: [['Scales','/scales.html']] },
+  { slug: 'public-domain-policy', url: '/public-domain-policy.html', published: '2026-07-20',
+    ogAlt: 'The public domain policy for Learn Piano Keys',
+    title: 'Public Domain Music Policy',
+    desc: 'Every piece on this site, its composer, when they died and why it is out of copyright. Our arrangements are our own work.',
+    scripts: ['engine','gate','site'], crumbs: [['Public domain policy','/public-domain-policy.html']], narrow: true },
   { slug: '404', url: '/404.html', published: '2026-07-19',
-    ogAlt: 'Page not found on Learn Piano Keys', title: 'Page not found · Learn Piano Keys',
+    ogAlt: 'Page not found on Learn Piano Keys', title: 'Page Not Found',
     desc: 'That page does not exist. Here is the way back to the lessons, the tools and the practice room.',
     scripts: ['engine', 'gate', 'site'], crumbs: [], noindex: true, narrow: true },
   { slug: 'privacy', url: '/privacy.html', published: '2026-07-18',
-    ogAlt: 'Privacy at Learn Piano Keys: no advertising and nothing uploaded', title: 'Privacy · Learn Piano Keys',
+    ogAlt: 'Privacy at Learn Piano Keys: no advertising and nothing uploaded', title: 'Privacy: What We Collect',
     desc: 'What Learn Piano Keys does and does not collect. Your playing never leaves your device.',
     scripts: ['engine', 'gate', 'site'], crumbs: [['Privacy', '/privacy.html']], narrow: true },
   { slug: 'terms', url: '/terms.html', published: '2026-07-18',
-    ogAlt: 'Terms of use for Learn Piano Keys', title: 'Terms of use · Learn Piano Keys',
+    ogAlt: 'Terms of use for Learn Piano Keys', title: 'Terms of Use',
     desc: 'Terms of use for Learn Piano Keys, a free browser piano practice tool.',
     scripts: ['engine', 'gate', 'site'], crumbs: [['Terms', '/terms.html']], narrow: true },
   { slug: 'contact', url: '/contact.html', published: '2026-07-18',
-    ogAlt: 'Contact Learn Piano Keys', title: 'Contact · Learn Piano Keys',
+    ogAlt: 'Contact Learn Piano Keys', title: 'Contact Learn Piano Keys',
     desc: 'Contact Learn Piano Keys about a bug, a piece you would like added, or anything else.',
     scripts: ['engine', 'gate', 'site'], crumbs: [['Contact', '/contact.html']], narrow: true }
 ];
@@ -141,9 +209,10 @@ function nav(active) {
   const items = [
     ['Start here', '/piano-keys-for-beginners.html', 'piano-keys-for-beginners'],
     ['Read music', '/how-to-read-music.html', 'how-to-read-music'],
-    ['Pieces', '/#pieces', 'index'],
+    ['Songs', '/songs.html', 'songs'],
+    ['Chords', '/chords.html', 'chords'],
     ['Tools', '/tools.html', 'tools'],
-    ['Practice', '/practice.html', 'practice'],
+    ['Progress', '/practice.html', 'practice'],
     ['What is free', '/#compare', null]
   ];
   return items.map(([label, href, slug]) =>
@@ -291,22 +360,36 @@ ${body}
       </div>
       <div>
         <h2>Play</h2>
-        <a href="/app.html?piece=twinkle">Twinkle, Twinkle</a>
-        <a href="/app.html?piece=ode-to-joy">Ode to Joy</a>
-        <a href="/app.html?piece=fur-elise">F&uuml;r Elise</a>
+        <a href="/songs.html">All songs</a>
+        <a href="/twinkle-twinkle-little-star-piano-notes.html">Twinkle, Twinkle</a>
+        <a href="/ode-to-joy-piano-notes.html">Ode to Joy</a>
+        <a href="/fur-elise-piano-notes.html">F&uuml;r Elise</a>
+      </div>
+      <div>
+        <h2>Guides</h2>
+        <a href="/piano-keyboard-layout.html">Piano keyboard layout</a>
+        <a href="/middle-c-on-piano.html">Where is middle C</a>
+        <a href="/piano-finger-numbers.html">Finger numbers</a>
+        <a href="/beginner-piano-roadmap.html">Beginner roadmap</a>
+        <a href="/how-long-to-learn-piano.html">How long does it take</a>
       </div>
       <div>
         <h2>Tools</h2>
-        <a href="/tools.html#chords">Chord finder</a>
-        <a href="/tools.html#scales">Scale explorer</a>
-        <a href="/tools.html#metronome">Metronome</a>
-        <a href="/practice.html">Practice tracker</a>
+        <a href="/piano-chord-finder.html">Chord finder</a>
+        <a href="/piano-scale-finder.html">Scale finder</a>
+        <a href="/online-piano-metronome.html">Metronome</a>
+        <a href="/online-piano-keyboard.html">Online keyboard</a>
+        <a href="/circle-of-fifths-piano.html">Circle of fifths</a>
+        <a href="/chords.html">Piano chords</a>
+        <a href="/scales.html">Piano scales</a>
+        <a href="/songs.html">All songs</a>
       </div>
       <div>
         <h2>Site</h2>
         <a href="/contact.html">Contact</a>
         <a href="/privacy.html">Privacy</a>
         <a href="/terms.html">Terms</a>
+        <a href="/public-domain-policy.html">Public domain policy</a>
       </div>
     </div>
     <p class="foot-legal">
@@ -384,7 +467,7 @@ const APP_SCHEMA = {
     'Fingering on every note', 'Grand staff notation', 'Metronome with tap tempo',
     'Chord finder', 'Scale explorer', 'Note quiz', 'Practice timer and streak',
     'Separate rhythm scoring', 'Separate reading literacy scoring',
-    'MIDI keyboard input', 'Sustain pedal', 'Microphone input', 'Printable sheet music'
+    'MIDI keyboard input', 'Sustain pedal', 'Microphone input', 'Carry on where you stopped'
   ],
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' }
 };
@@ -453,8 +536,9 @@ const LEARNING_SCHEMA = {
 };
 
 let count = 0;
+PAGES.push.apply(PAGES, GENERATED);
 PAGES.forEach(p => {
-  const body = fs.readFileSync(path.join(ROOT, 'src', p.slug + '.html'), 'utf8');
+  const body = p.body || fs.readFileSync(path.join(ROOT, 'src', p.slug + '.html'), 'utf8');
   const extra = [];
   const faq = faqSchema(body, p.url);
   if (faq) extra.push(faq);

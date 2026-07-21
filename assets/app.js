@@ -8,6 +8,7 @@ const S = {
   piece: PIECES[0],
   bpm: 88,
   hand: 'both',        // both | r | l
+  level: 3,            // 1 melody, 2 melody plus bass, 3 both hands
   wait: true,
   read: false,         // notation only, falling notes hidden
   showFingers: true,
@@ -56,7 +57,8 @@ let kb, rollCv, rollCx, staffCv, staffCx;
 const el = id => document.getElementById(id);
 const unitSec = () => 60 / S.bpm / 4;
 const tm = n => n.m + S.transpose;
-const activeNotes = () => S.piece.notes.filter(n => S.hand === 'both' || n.h === S.hand);
+const inLevel = n => (n.lvl || 1) <= S.level;
+const activeNotes = () => S.piece.notes.filter(n => inLevel(n) && (S.hand === 'both' || n.h === S.hand));
 const pickup = () => S.piece.pickup || 0;
 const barCount = () => Math.ceil((S.piece.totalUnits - pickup()) / S.piece.barUnits);
 const barStart = b => pickup() + b * S.piece.barUnits;
@@ -111,6 +113,8 @@ function boot() {
   const store = LPK.load();
   const want = params.get('piece') || store.lastPiece;
   if (want && PIECES.some(p => p.id === want)) S.piece = PIECES.find(p => p.id === want);
+  const lvl = parseInt(params.get('level'), 10);
+  if (lvl >= 1 && lvl <= 3) S.level = lvl;
   S.bpm = S.piece.bpm;
 
   buildPieceMenu();
@@ -137,9 +141,16 @@ function boot() {
   const resumed = restoreSession();
   loadPiece(true);
   if (resumed) {
-    flashHint('Picked up where you left off. Press Restart to go back to the beginning.');
+    const strip = el('resumeStrip');
+    if (strip) strip.hidden = false;
     say('Resumed from bar ' + (barOf(S.cursor) + 1));
   }
+  el('freshBtn').addEventListener('click', () => {
+    const st = LPK.load();
+    delete st.session;
+    LPK.save(st);
+    location.href = '/app.html';
+  });
   reflectControls();
   bindHowto();
   bindInvite();
@@ -160,6 +171,26 @@ function sizeCanvases() {
   });
 }
 
+function switchPiece(id) {
+  if (id === S.piece.id) return;
+  S.piece = PIECES.find(p => p.id === id) || S.piece;
+  S.bpm = S.piece.bpm;
+  loadPiece(false);
+  reflectControls();
+  saveSession();
+}
+
+function paintPieceCards() {
+  const wrap = el('pieceCards');
+  if (!wrap) return;
+  wrap.querySelectorAll('.piece-card').forEach(b => {
+    b.classList.toggle('active', b.dataset.piece === S.piece.id);
+    b.setAttribute('aria-pressed', String(b.dataset.piece === S.piece.id));
+  });
+  const sel = el('pieceSel');
+  if (sel && sel.value !== S.piece.id) sel.value = S.piece.id;
+}
+
 function buildPieceMenu() {
   const sel = el('pieceSel');
   PIECES.forEach(p => {
@@ -169,16 +200,27 @@ function buildPieceMenu() {
   });
   sel.value = S.piece.id;
   sel.addEventListener('change', () => {
-    S.piece = PIECES.find(p => p.id === sel.value);
-    S.bpm = S.piece.bpm;
-    loadPiece(false);
-    reflectControls();
-    saveSession();
+    switchPiece(sel.value);
   });
+
+  const wrap = el('pieceCards');
+  if (wrap) {
+    PIECES.forEach(p => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'piece-card';
+      b.dataset.piece = p.id;
+      b.innerHTML = '<b>' + p.title + '</b><span>' + p.levelName + '</span>';
+      b.addEventListener('click', () => switchPiece(p.id));
+      wrap.appendChild(b);
+    });
+    paintPieceCards();
+  }
 }
 
 function loadPiece(keepSession) {
   stop();
+  paintPieceCards();
   S.cursor = pickup() - 4;
   S.results.clear();
   S.take = [];
@@ -309,7 +351,7 @@ function initMidi() {
   const badge = el('midiBadge');
   if (!navigator.requestMIDIAccess) {
     badge.textContent = 'No MIDI in this browser';
-    badge.className = 'badge warn';
+    badge.className = 'badge status warn';
     return;
   }
   navigator.requestMIDIAccess().then(access => {
@@ -317,13 +359,13 @@ function initMidi() {
       const inputs = [...access.inputs.values()];
       inputs.forEach(i => { i.onmidimessage = onMidi; });
       badge.textContent = inputs.length ? `MIDI: ${inputs[0].name}` : 'MIDI ready. Plug in a keyboard';
-      badge.className = inputs.length ? 'badge ok' : 'badge';
+      badge.className = inputs.length ? 'badge status ok' : 'badge status';
     };
     access.onstatechange = attach;
     attach();
   }).catch(() => {
     badge.textContent = 'MIDI blocked. Use the on-screen keys';
-    badge.className = 'badge warn';
+    badge.className = 'badge status warn';
   });
 }
 
@@ -341,13 +383,15 @@ async function toggleMic(on) {
     if (detector) detector.stop();
     S.mic = false;
     badge.textContent = 'Microphone off';
-    badge.className = 'badge';
+    badge.className = 'badge status';
+    badge.setAttribute('aria-pressed', 'false');
     return;
   }
   audio.resume();
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     badge.textContent = 'No microphone access in this browser';
-    badge.className = 'badge warn';
+    badge.className = 'badge status warn';
+    badge.setAttribute('aria-pressed', 'false');
     el('micMode').classList.remove('active');
     return;
   }
@@ -358,10 +402,12 @@ async function toggleMic(on) {
     await detector.start();
     S.mic = true;
     badge.textContent = 'Microphone on (one note at a time)';
-    badge.className = 'badge warn';
+    badge.className = 'badge status warn';
+    badge.setAttribute('aria-pressed', 'true');
   } catch (err) {
     badge.textContent = 'Microphone permission refused';
-    badge.className = 'badge warn';
+    badge.className = 'badge status warn';
+    badge.setAttribute('aria-pressed', 'false');
     el('micMode').classList.remove('active');
     el('micMode').setAttribute('aria-pressed', 'false');
   }
@@ -369,6 +415,7 @@ async function toggleMic(on) {
 
 /* ---------------- player note handling ---------------- */
 function playerNoteOn(midi, fromUser, vel = 0.85) {
+  if (fromUser && window.LPKSession) LPKSession.activity();
   audio.noteOn(midi, vel);
   S.held.add(midi);
   paintKey(midi, true, null);
@@ -554,7 +601,7 @@ function stop() {
   S.countInUntil = null;
   audio.allOff();
   S.held.clear();
-  if (kb) kb.keys.forEach(k => k.classList.remove('on', 'lh', 'rh', 'target'));
+  if (kb) kb.keys.forEach(k => k.classList.remove('on', 'lh', 'rh', 'target', 't-l', 't-r'));
   litTargets = [];
   const b = el('playBtn');
   if (b) { b.textContent = 'Play'; b.classList.remove('is-playing'); }
@@ -621,7 +668,7 @@ function frame(ts) {
       sweepMisses();
       if (S.accompany && S.hand !== 'both' && !S.takePlaying) {
         S.piece.notes.forEach(n => {
-          if (n.h === S.hand || n._p) return;
+          if (!inLevel(n) || n.h === S.hand || n._p) return;
           if (S.cursor >= n.s && S.cursor < n.s + 0.5) {
             n._p = true;
             const m = tm(n);
@@ -721,6 +768,7 @@ function saveSession() {
     cursor: Math.max(pickup(), Math.floor(S.cursor)),
     bpm: S.bpm,
     hand: S.hand,
+    level: S.level,
     transpose: S.transpose,
     loop: S.loop,
     wait: S.wait, read: S.read, countIn: S.countIn, metronome: S.metronome,
@@ -735,6 +783,7 @@ function restoreSession() {
   if (!saved || saved.piece !== S.piece.id) return false;
   S.bpm = saved.bpm || S.bpm;
   S.hand = saved.hand || 'both';
+  if (saved.level >= 1 && saved.level <= 3) S.level = saved.level;
   S.transpose = saved.transpose || 0;
   S.loop = saved.loop || null;
   ['wait', 'read', 'countIn', 'metronome', 'accompany'].forEach(k => {
@@ -755,6 +804,28 @@ function reflectControls() {
   el('bpm').value = S.bpm;
   el('bpmOut').textContent = S.bpm;
   updateTransposeUI();
+  document.querySelectorAll('[data-level]').forEach(b => {
+    b.addEventListener('click', () => {
+      S.level = +b.dataset.level;
+      document.querySelectorAll('[data-level]').forEach(x => {
+        const on = x === b;
+        x.classList.toggle('active', on);
+        x.setAttribute('aria-pressed', String(on));
+      });
+      S.results.clear();
+      S.session = { notes: 0, hit: 0, timing: 0, literacyNotes: 0, literacyHit: 0 };
+      updateScores(); renderTrouble(); saveSession();
+      flashHint(S.level === 1 ? 'Melody only, right hand.'
+        : S.level === 2 ? 'Melody with one bass note under each bar.'
+        : 'Both hands, the full arrangement.');
+    });
+  });
+
+  document.querySelectorAll('[data-level]').forEach(b => {
+    const on = +b.dataset.level === S.level;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
   document.querySelectorAll('[data-hand]').forEach(b => {
     const on = b.dataset.hand === S.hand;
     b.classList.toggle('active', on);
@@ -825,13 +896,13 @@ function paintNextKeys() {
   const want = [];
   if (S.playing && S.wait && S.waitingAt !== null) {
     activeNotes().forEach(n => {
-      if (Math.abs(n.s - S.waitingAt) < 0.001 && !S.results.has(S.piece.notes.indexOf(n))) want.push(tm(n));
+      if (Math.abs(n.s - S.waitingAt) < 0.001 && !S.results.has(S.piece.notes.indexOf(n))) want.push({ m: tm(n), h: n.h });
     });
   }
-  if (want.length === litTargets.length && want.every((m, i) => m === litTargets[i])) return;
-  litTargets.forEach(m => { const k = kb && kb.keys.get(m); if (k) k.classList.remove('target'); });
+  if (want.length === litTargets.length && want.every((t, i) => t.m === litTargets[i].m && t.h === litTargets[i].h)) return;
+  litTargets.forEach(t => { const k = kb && kb.keys.get(t.m); if (k) k.classList.remove('target', 't-l', 't-r'); });
   litTargets = want;
-  litTargets.forEach(m => { const k = kb && kb.keys.get(m); if (k) k.classList.add('target'); });
+  litTargets.forEach(t => { const k = kb && kb.keys.get(t.m); if (k) k.classList.add('target', t.h === 'l' ? 't-l' : 't-r'); });
 }
 
 /* Plain English, always on screen, saying what to do right now. */
@@ -922,6 +993,7 @@ function drawRoll() {
 
   const px = h / LOOKAHEAD;
   S.piece.notes.forEach((n, i) => {
+    if (!inLevel(n)) return;
     const rel = n.s - S.cursor;
     if (rel > LOOKAHEAD || rel + n.d < -1) return;
     const midi = tm(n);
@@ -1028,7 +1100,7 @@ function paintSystem(c, o) {
   }
 
   S.piece.notes.forEach((n, i) => {
-    if (n.s < o.fromUnit || n.s >= o.toUnit) return;
+    if (!inLevel(n) || n.s < o.fromUnit || n.s >= o.toUnit) return;
     const midi = tm(n);
     const isActive = o.light || S.hand === 'both' || n.h === S.hand;
     const treble = midi >= 60 || n.h === 'r';
@@ -1147,69 +1219,6 @@ function drawBassClef(c, x, y, gap, light) {
   c.restore();
 }
 
-/* ---------------- printable score ---------------- */
-function buildScoreImage() {
-  const bu = S.piece.barUnits;
-  const barsPerSystem = bu <= 6 ? 6 : 4;
-  const off = pickup() > 0 ? 1 : 0;
-  const totalBars = barCount() + off;
-  const systems = Math.ceil(totalBars / barsPerSystem);
-
-  const W = 1240, gap = 13, sysH = 190, top = 190;
-  const H = top + systems * sysH + 80;
-  const cv = document.createElement('canvas');
-  cv.width = W; cv.height = H;
-  const c = cv.getContext('2d');
-  c.fillStyle = '#FFFFFF'; c.fillRect(0, 0, W, H);
-
-  c.fillStyle = '#14100F';
-  c.textAlign = 'center';
-  c.font = '600 40px "Bodoni Moda", Georgia, serif';
-  c.fillText(S.piece.title, W / 2, 74);
-  c.font = '18px "Instrument Sans", system-ui, sans-serif';
-  c.fillStyle = 'rgba(20,16,15,.65)';
-  c.fillText(`${S.piece.composer} · ${S.piece.origin}`, W / 2, 104);
-  c.font = '14px "IBM Plex Mono", monospace';
-  c.fillText(`${S.piece.keyName} · ${S.piece.meter.join('/')} · quarter = ${S.bpm}`, W / 2, 130);
-
-  for (let sIdx = 0; sIdx < systems; sIdx++) {
-    const firstBar = sIdx * barsPerSystem;
-    const fromUnit = (firstBar === 0 && off) ? 0 : barStart(firstBar - off);
-    const lastBar = Math.min(totalBars, firstBar + barsPerSystem);
-    const toUnit = barStart(lastBar - off);
-    paintSystem(c, {
-      x: 80, y: top + sIdx * sysH, w: W - 160, gap,
-      fromUnit, toUnit: Math.max(toUnit, fromUnit + bu),
-      names: false, fingers: true, light: true
-    });
-  }
-
-  c.textAlign = 'center';
-  c.font = '13px "IBM Plex Mono", monospace';
-  c.fillStyle = 'rgba(20,16,15,.5)';
-  c.fillText('learnpianokeys.com · public domain · fingering shown above the staff', W / 2, H - 34);
-
-  return cv.toDataURL('image/png');
-}
-
-/* Open in a new tab so the score can be SEEN before saving, printing or
-   sharing, on desktop and on mobile. Never auto-route into a share sheet. */
-function printScore() {
-  const url = buildScoreImage();
-  const win = window.open('', '_blank');
-  if (!win) { flashHint('Allow pop-ups to open the printable score'); return; }
-  win.document.write(
-    `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${S.piece.title} · sheet music</title>` +
-    `<style>body{margin:0;background:#f5f2ec;font:16px system-ui;text-align:center}` +
-    `img{max-width:100%;height:auto;background:#fff;box-shadow:0 2px 24px rgba(0,0,0,.15);margin:18px auto;display:block}` +
-    `button{font:inherit;padding:10px 18px;margin:14px;border:0;border-radius:8px;background:#14100F;color:#F4EDE2;cursor:pointer}` +
-    `@media print{button{display:none}body{background:#fff}img{box-shadow:none;margin:0}}</style></head><body>` +
-    `<button onclick="window.print()">Print or save as PDF</button>` +
-    `<img src="${url}" alt="${S.piece.title} sheet music"></body></html>`
-  );
-  win.document.close();
-}
-
 /* ---------------- controls ---------------- */
 function flashHint(text) {
   const h = el('hint');
@@ -1228,16 +1237,6 @@ function updateTransposeUI() {
 function bindControls() {
   el('playBtn').addEventListener('click', () => S.playing ? stop() : start());
   el('restartBtn').addEventListener('click', restart);
-  el('printBtn').addEventListener('click', printScore);
-
-  el('shareScoreBtn').addEventListener('click', () => {
-    const url = buildScoreImage();
-    const slug = S.piece.id;
-    LPKShare.shareImage(url, `learnpianokeys-${slug}-sheet-music.png`,
-      `${S.piece.title} sheet music`,
-      `${S.piece.title} by ${S.piece.composer}, free sheet music from learnpianokeys.com`);
-  });
-
   el('shareLinkBtn').addEventListener('click', () => {
     LPKShare.shareLink(`https://learnpianokeys.com/app.html?piece=${S.piece.id}`,
       `Play ${S.piece.title} free`,
@@ -1253,6 +1252,23 @@ function bindControls() {
 
   el('transDown').addEventListener('click', () => { S.transpose = Math.max(-6, S.transpose - 1); updateTransposeUI(); });
   el('transUp').addEventListener('click', () => { S.transpose = Math.min(6, S.transpose + 1); updateTransposeUI(); });
+
+  document.querySelectorAll('[data-level]').forEach(b => {
+    b.addEventListener('click', () => {
+      S.level = +b.dataset.level;
+      document.querySelectorAll('[data-level]').forEach(x => {
+        const on = x === b;
+        x.classList.toggle('active', on);
+        x.setAttribute('aria-pressed', String(on));
+      });
+      S.results.clear();
+      S.session = { notes: 0, hit: 0, timing: 0, literacyNotes: 0, literacyHit: 0 };
+      updateScores(); renderTrouble(); saveSession();
+      flashHint(S.level === 1 ? 'Melody only, right hand.'
+        : S.level === 2 ? 'Melody with one bass note under each bar.'
+        : 'Both hands, the full arrangement.');
+    });
+  });
 
   document.querySelectorAll('[data-hand]').forEach(b => {
     b.addEventListener('click', () => {
@@ -1292,6 +1308,8 @@ function bindControls() {
       b.setAttribute('aria-pressed', String(next));
     });
   });
+
+  el('micBadge').addEventListener('click', () => el('micMode').click());
 
   el('clearLoop').addEventListener('click', () => {
     S.loop = null;

@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Practice room · Learn Piano Keys</title>
+  <title>Practice Room: Play a Real Piece</title>
   <meta name="description" content="Practise real pieces with wait mode, section looping, hand separation, tempo, transpose, count-in, sustain pedal and a grand staff.">
   <meta name="robots" content="noindex, follow">
   <meta name="theme-color" content="#14100F">
   <link rel="canonical" href="https://learnpianokeys.com/app.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Learn Piano Keys">
-  <meta property="og:title" content="Practice room · Learn Piano Keys">
+  <meta property="og:title" content="Practice Room: Play a Real Piece">
   <meta property="og:description" content="Practise real pieces with wait mode, section looping, hand separation, tempo, transpose, count-in, sustain pedal and a grand staff.">
   <meta property="og:url" content="https://learnpianokeys.com/app.html">
   <meta property="og:image" content="https://learnpianokeys.com/og-app.png">
@@ -20,7 +20,7 @@
   <meta property="og:image:alt" content="The Learn Piano Keys practice room, with falling notes above a piano keybed">
   <meta property="og:locale" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Practice room · Learn Piano Keys">
+  <meta name="twitter:title" content="Practice Room: Play a Real Piece">
   <meta name="twitter:description" content="Practise real pieces with wait mode, section looping, hand separation, tempo, transpose, count-in, sustain pedal and a grand staff.">
   <meta name="twitter:image" content="https://learnpianokeys.com/og-app.png">
   <meta name="twitter:image:alt" content="The Learn Piano Keys practice room, with falling notes above a piano keybed">
@@ -40,7 +40,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/styles.css?v=10">
+  <link rel="stylesheet" href="/assets/styles.css?v=13">
   <script>(function(){try{var t=localStorage.getItem('lpk.theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body class="wide">
@@ -54,9 +54,10 @@
     <nav class="nav" id="nav" aria-label="Main">
       <a href="/piano-keys-for-beginners.html">Start here</a>
       <a href="/how-to-read-music.html">Read music</a>
-      <a href="/#pieces">Pieces</a>
+      <a href="/songs.html">Songs</a>
+      <a href="/chords.html">Chords</a>
       <a href="/tools.html">Tools</a>
-      <a href="/practice.html">Practice</a>
+      <a href="/practice.html">Progress</a>
       <a href="/#compare">What is free</a>
       <button class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark">Light</button>
       <button class="pill signin" id="signInBtn" hidden>Sign in</button>
@@ -112,11 +113,20 @@
       <div class="stage-meta" id="pieceMeta"></div>
     </div>
     <div class="picker">
-      <span class="badge" id="midiBadge">Checking for MIDI…</span>
-      <span class="badge" id="micBadge">Microphone off</span>
+      <span class="badge status" id="midiBadge">Checking for MIDI…</span>
+      <button type="button" class="badge status" id="micBadge" aria-pressed="false" title="Turn the microphone on or off">Microphone off</button>
+      <span class="badge sess" id="sessTime" title="Time practised this visit. It pauses by itself when you step away." hidden>0:00</span>
+      <button type="button" class="badge sess-finish" id="sessFinish" hidden>Finish session</button>
       <select id="pieceSel" aria-label="Choose a piece"></select>
     </div>
   </div>
+
+  <div class="resume-strip" id="resumeStrip" hidden>
+    <span>Picked up where you left off.</span>
+    <button type="button" class="pill" id="freshBtn">Start afresh</button>
+  </div>
+
+  <div class="piece-cards" id="pieceCards" role="group" aria-label="Choose a piece"></div>
 
   <div class="layout">
     <div>
@@ -161,6 +171,12 @@
         </div>
         <div class="spacer"></div>
         <div class="pill-row">
+          <span class="label">Level</span>
+          <button class="pill" data-level="1" aria-pressed="false">1 One hand</button>
+          <button class="pill" data-level="2" aria-pressed="false">2 Add bass</button>
+          <button class="pill active" data-level="3" aria-pressed="true">3 Both hands</button>
+        </div>
+        <div class="pill-row">
           <span class="label">Hands</span>
           <button class="pill active" data-hand="both" aria-pressed="true">Both</button>
           <button class="pill" data-hand="l" aria-pressed="false">Left</button>
@@ -201,13 +217,11 @@
         <div class="pill-row">
           <button class="pill" id="takeBtn">Hear your take</button>
           <button class="pill" id="takeRefBtn">Take against the reference</button>
-          <button class="pill" id="printBtn">Sheet music</button>
-          <button class="pill" id="shareScoreBtn">Share the sheet music</button>
           <button class="pill" id="shareLinkBtn">Share the link</button>
         </div>
         <p class="score-note" style="margin-top:14px">
           Hearing your own timing back is the fastest way to fix it. Your playing is replayed from your device only; nothing is uploaded.
-          Sharing an image and sharing a link are separate buttons on purpose: when a picture is attached, some messaging apps drop the text, so the link would never arrive.
+          Everything stays inside the app: nothing is downloaded, and your place is kept for you so you can stop and carry on later.
         </p>
       </div>
     </div>
@@ -281,22 +295,36 @@
       </div>
       <div>
         <h2>Play</h2>
-        <a href="/app.html?piece=twinkle">Twinkle, Twinkle</a>
-        <a href="/app.html?piece=ode-to-joy">Ode to Joy</a>
-        <a href="/app.html?piece=fur-elise">F&uuml;r Elise</a>
+        <a href="/songs.html">All songs</a>
+        <a href="/twinkle-twinkle-little-star-piano-notes.html">Twinkle, Twinkle</a>
+        <a href="/ode-to-joy-piano-notes.html">Ode to Joy</a>
+        <a href="/fur-elise-piano-notes.html">F&uuml;r Elise</a>
+      </div>
+      <div>
+        <h2>Guides</h2>
+        <a href="/piano-keyboard-layout.html">Piano keyboard layout</a>
+        <a href="/middle-c-on-piano.html">Where is middle C</a>
+        <a href="/piano-finger-numbers.html">Finger numbers</a>
+        <a href="/beginner-piano-roadmap.html">Beginner roadmap</a>
+        <a href="/how-long-to-learn-piano.html">How long does it take</a>
       </div>
       <div>
         <h2>Tools</h2>
-        <a href="/tools.html#chords">Chord finder</a>
-        <a href="/tools.html#scales">Scale explorer</a>
-        <a href="/tools.html#metronome">Metronome</a>
-        <a href="/practice.html">Practice tracker</a>
+        <a href="/piano-chord-finder.html">Chord finder</a>
+        <a href="/piano-scale-finder.html">Scale finder</a>
+        <a href="/online-piano-metronome.html">Metronome</a>
+        <a href="/online-piano-keyboard.html">Online keyboard</a>
+        <a href="/circle-of-fifths-piano.html">Circle of fifths</a>
+        <a href="/chords.html">Piano chords</a>
+        <a href="/scales.html">Piano scales</a>
+        <a href="/songs.html">All songs</a>
       </div>
       <div>
         <h2>Site</h2>
         <a href="/contact.html">Contact</a>
         <a href="/privacy.html">Privacy</a>
         <a href="/terms.html">Terms</a>
+        <a href="/public-domain-policy.html">Public domain policy</a>
       </div>
     </div>
     <p class="foot-legal">
@@ -334,12 +362,13 @@
 <div class="hint" id="hint"></div>
 <div id="sr" class="sr-only" role="status" aria-live="polite"></div>
 
-<script src="/assets/pieces.js?v=10"></script>
-<script src="/assets/engine.js?v=10"></script>
-<script src="/assets/gate.js?v=10"></script>
-<script src="/assets/site.js?v=10"></script>
-<script src="/assets/share.js?v=10"></script>
-<script src="/assets/app.js?v=10"></script>
+<script src="/assets/pieces.js?v=13"></script>
+<script src="/assets/engine.js?v=13"></script>
+<script src="/assets/gate.js?v=13"></script>
+<script src="/assets/site.js?v=13"></script>
+<script src="/assets/share.js?v=13"></script>
+<script src="/assets/session.js?v=13"></script>
+<script src="/assets/app.js?v=13"></script>
 
 <script type="application/ld+json">
 {
@@ -373,7 +402,7 @@
       "@type": "WebPage",
       "@id": "https://learnpianokeys.com/app.html#webpage",
       "url": "https://learnpianokeys.com/app.html",
-      "name": "Practice room · Learn Piano Keys",
+      "name": "Practice Room: Play a Real Piece",
       "description": "Practise real pieces with wait mode, section looping, hand separation, tempo, transpose, count-in, sustain pedal and a grand staff.",
       "isPartOf": {
         "@id": "https://learnpianokeys.com/#website"
@@ -383,7 +412,7 @@
       },
       "inLanguage": "en-GB",
       "datePublished": "2026-07-18",
-      "dateModified": "2026-07-20",
+      "dateModified": "2026-07-21",
       "isAccessibleForFree": true,
       "primaryImageOfPage": {
         "@type": "ImageObject",
