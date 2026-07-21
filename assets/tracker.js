@@ -19,10 +19,10 @@
     'twinkle': 'Twinkle, Twinkle, Little Star'
   };
 
-  function dayList(s) { return Object.keys((s.minutes || {})).sort(); }
+  function dayList() { return LPK.practiceDays(); }
 
   function longestStreak(s) {
-    var days = dayList(s);
+    var days = dayList();
     if (!days.length) return 0;
     var best = 1, run = 1;
     for (var i = 1; i < days.length; i++) {
@@ -37,17 +37,17 @@
   function paintStats() {
     var s = LPK.load();
     var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
-    var mins = (s.minutes || {})[LPK.today()] || 0;
-    set('todayMin', mins);
-    set('totalMin', s.totalMinutes || 0);
+    var todaySec = LPK.secOn(LPK.today());
+    set('todayMin', LPK.fmtDur(todaySec));
+    set('totalMin', LPK.fmtDur(LPK.totalSeconds()));
     set('streakDays', LPK.streak());
     var w = document.getElementById('streakWord');
     if (w) w.textContent = LPK.streak() === 1 ? 'day' : 'days';
     set('longestOut', longestStreak(s));
-    set('daysOut', dayList(s).length);
+    set('daysOut', dayList().length);
     set('piecesOut', Object.keys(s.best || {}).length);
     var note = document.getElementById('todayNote');
-    if (note) note.textContent = mins ? 'Logged today. That is the hard part done.' : 'Ready when you are.';
+    if (note) note.textContent = todaySec ? 'Logged today. That is the hard part done.' : 'Ready when you are.';
 
     var lp = document.getElementById('lessonProgress');
     if (lp) {
@@ -98,7 +98,6 @@
   function keyOf(d) { return d.toISOString().slice(0, 10); }
 
   function chartDays(s) {
-    var mins = s.minutes || {};
     var from, to;
     var today = new Date(LPK.today() + 'T00:00:00Z');
     if (range.mode === 'custom' && range.from && range.to) {
@@ -106,7 +105,7 @@
       to = new Date(range.to + 'T00:00:00Z');
       if (from > to) { var t = from; from = to; to = t; }
     } else if (range.mode === 'all') {
-      var all = dayList(s);
+      var all = dayList();
       from = all.length ? new Date(all[0] + 'T00:00:00Z') : today;
       to = today;
     } else {
@@ -121,7 +120,7 @@
     for (var i = 0; i <= span; i++) {
       var d = new Date(from.getTime() + i * 86400000);
       var k = keyOf(d);
-      days.push({ key: k, v: mins[k] || 0 });
+      days.push({ key: k, v: LPK.secOn(k) / 60 });
     }
     return days;
   }
@@ -167,7 +166,7 @@
     c.fillStyle = inkTx;
     c.font = '10px "IBM Plex Mono", monospace';
     c.textAlign = 'right';
-    c.fillText(String(max || 0), padL - 6, padT + 10);
+    c.fillText(String(Math.ceil(max) || 0), padL - 6, padT + 10);
     if (max > 0) c.fillText(String(Math.round(max / 2)), padL - 6, padT + plotH / 2 + 4);
     c.fillText('0', padL - 6, H - padB + 4);
 
@@ -196,7 +195,7 @@
     var noteEl = document.getElementById('progNote');
     if (noteEl) {
       noteEl.textContent = total
-        ? total + ' minutes over ' + n + ' days, practised on ' + active + ' of them.'
+        ? LPK.fmtDur(Math.round(total * 60)) + ' over ' + n + ' days, practised on ' + active + ' of them.'
         : 'Nothing logged in this range yet. Minutes from the practice room land here on their own.';
     }
   }
@@ -258,12 +257,12 @@
   document.getElementById('timerSave').addEventListener('click', function () {
     if (running) { elapsed += performance.now() - started; running = false; clearInterval(tick); }
     document.getElementById('timerToggle').textContent = 'Start';
-    var mins = Math.round(elapsed / 60000);
-    if (mins < 1) {
+    var secs = Math.round(elapsed / 1000);
+    if (secs < 1) {
       var h = document.getElementById('hint');
-      if (h) { h.textContent = 'Less than a minute, so nothing was added.'; h.classList.add('show'); setTimeout(function () { h.classList.remove('show'); }, 1800); }
+      if (h) { h.textContent = 'Nothing on the clock yet.'; h.classList.add('show'); setTimeout(function () { h.classList.remove('show'); }, 1800); }
     } else {
-      LPK.addMinutes(mins);
+      LPK.addSeconds(secs);
     }
     elapsed = 0; render(); paintStats();
   });
@@ -272,11 +271,16 @@
     if (running) { running = false; clearInterval(tick); document.getElementById('timerToggle').textContent = 'Start'; }
     elapsed = 0; render();
     var s = LPK.load();
-    if (s.minutes && s.minutes[LPK.today()]) {
-      s.totalMinutes = Math.max(0, (s.totalMinutes || 0) - s.minutes[LPK.today()]);
-      delete s.minutes[LPK.today()];
-      LPK.save(s);
+    var t = LPK.today();
+    if (s.minutes && s.minutes[t]) {
+      s.totalMinutes = Math.max(0, (s.totalMinutes || 0) - s.minutes[t]);
+      delete s.minutes[t];
     }
+    if (s.sec && s.sec[t]) {
+      s.totalSec = Math.max(0, (s.totalSec || 0) - s.sec[t]);
+      delete s.sec[t];
+    }
+    LPK.save(s);
     paintStats();
   });
 

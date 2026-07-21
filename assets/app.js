@@ -31,7 +31,9 @@ const S = {
   lastClickBeat: null,
   countInUntil: null,
   take: [],
-  takePlaying: false
+  takePlaying: false,
+  demo: false,
+  demoPrev: null
 };
 
 /* The keyboard shrinks on small screens rather than being squeezed:
@@ -146,10 +148,26 @@ function boot() {
     say('Resumed from bar ' + (barOf(S.cursor) + 1));
   }
   el('freshBtn').addEventListener('click', () => {
+    if (S.demo) stopDemo();
+    stop();
     const st = LPK.load();
     delete st.session;
     LPK.save(st);
-    location.href = '/app.html';
+    S.transpose = 0;
+    S.loop = null;
+    S.bpm = S.piece.bpm;
+    S.hand = 'both';
+    S.level = S.piece.level > 2 ? 3 : S.piece.level;
+    S.wait = true; S.read = false; S.countIn = true; S.metronome = false;
+    S.accompany = true; S.showFingers = true; S.showLetters = true; S.showNames = true;
+    el('keys').classList.remove('hide-names');
+    el('readCard').classList.remove('lit');
+    el('loopOut').textContent = 'off';
+    loadPiece(false);
+    reflectControls();
+    const strip = el('resumeStrip');
+    if (strip) strip.hidden = true;
+    say('Starting afresh from the top');
   });
   reflectControls();
   bindHowto();
@@ -173,6 +191,7 @@ function sizeCanvases() {
 
 function switchPiece(id) {
   if (id === S.piece.id) return;
+  if (S.demo) stopDemo();
   S.piece = PIECES.find(p => p.id === id) || S.piece;
   S.bpm = S.piece.bpm;
   loadPiece(false);
@@ -440,7 +459,25 @@ function paintKey(midi, on, hand) {
   k.classList.toggle('rh', hand === 'r');
 }
 
+/* A small finger-number chip drawn on the key itself, in the hand's colour. */
+function fingerChipOn(midi, f, hand) {
+  const k = kb && kb.keys.get(midi);
+  if (!k || !f) return;
+  fingerChipOff(midi);
+  const c = document.createElement('span');
+  c.className = 'fchip ' + (hand === 'l' ? 'fc-l' : 'fc-r');
+  c.textContent = f;
+  k.appendChild(c);
+}
+function fingerChipOff(midi) {
+  const k = kb && kb.keys.get(midi);
+  if (!k) return;
+  const c = k.querySelector('.fchip');
+  if (c) c.remove();
+}
+
 function judge(midi) {
+  if (S.demo) return;
   markPractice();
   let best = -1, bestD = Infinity;
   activeNotes().forEach(n => {
@@ -463,7 +500,15 @@ function judge(midi) {
   const dt = stuckHere > 0 ? -stuckHere : (onset - S.cursor);
   S.results.set(best, { hit: true, dt });
   S.session.notes++; S.session.hit++;
-  S.session.timing += Math.max(0, 1 - Math.abs(dt) / HIT_WINDOW);
+  /* In wait mode the transport stops for you, so timing grades how promptly
+     you catch the block once it lands: within one beat is full marks, fading
+     out over the next two. Off wait mode it grades the beat strictly. */
+  if (stuckHere > 0) {
+    const beat = S.piece.barUnits / S.piece.meter[0];
+    S.session.timing += Math.max(0, 1 - Math.max(0, stuckHere - beat) / (2 * beat));
+  } else {
+    S.session.timing += Math.max(0, 1 - Math.abs(dt) / HIT_WINDOW);
+  }
   if (S.read) { S.session.literacyNotes++; S.session.literacyHit++; }
   flashJudge(Math.abs(dt) <= HIT_WINDOW ? 'good' : 'late');
   updateScores();
@@ -472,6 +517,7 @@ function judge(midi) {
 /* Anything the transport has left behind unplayed counts as a miss,
    which is what makes the trouble-spot panel worth reading. */
 function sweepMisses() {
+  if (S.demo) return;
   activeNotes().forEach(n => {
     const i = S.piece.notes.indexOf(n);
     if (S.results.has(i)) return;
@@ -608,6 +654,47 @@ function stop() {
   if (wasPlaying) { recordBest(); renderTrouble(); saveSession(); say('Paused'); }
 }
 
+/* The app performs the piece itself: keys press in hand colours with finger
+   chips, nothing is scored, and it hands back control at the end. */
+function startDemo() {
+  if (S.demo) return;
+  stop();
+  S.demoPrev = { wait: S.wait, metronome: S.metronome, countIn: S.countIn };
+  S.demo = true;
+  S.wait = false;
+  S.metronome = false;
+  S.results.clear();
+  S.take = [];
+  S.cursor = startUnit();
+  const b = el('demoBtn');
+  if (b) { b.textContent = 'Stop demo'; b.classList.add('active'); b.setAttribute('aria-pressed', 'true'); }
+  start();
+  say('Playing the demo');
+}
+
+function stopDemo() {
+  if (!S.demo) return;
+  stop();
+  S.demo = false;
+  if (S.demoPrev) {
+    S.wait = S.demoPrev.wait;
+    S.metronome = S.demoPrev.metronome;
+    S.countIn = S.demoPrev.countIn;
+    S.demoPrev = null;
+  }
+  S.piece.notes.forEach(n => {
+    if (n._p) { const m = tm(n); audio.noteOff(m); paintKey(m, false, null); fingerChipOff(m); n._p = false; }
+  });
+  S.cursor = pickup() - 4;
+  S.results.clear();
+  S.session = { notes: 0, hit: 0, timing: 0, literacyNotes: 0, literacyHit: 0 };
+  updateScores();
+  reflectControls();
+  const b = el('demoBtn');
+  if (b) { b.textContent = 'Hear the demo'; b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); }
+  say('Demo finished. Your turn.');
+}
+
 function restart() {
   S.cursor = startUnit();
   if (!S.loop) {
@@ -666,15 +753,17 @@ function frame(ts) {
 
     if (!leadIn) {
       sweepMisses();
-      if (S.accompany && S.hand !== 'both' && !S.takePlaying) {
+      if (S.demo || (S.accompany && S.hand !== 'both' && !S.takePlaying)) {
         S.piece.notes.forEach(n => {
-          if (!inLevel(n) || n.h === S.hand || n._p) return;
+          if (!inLevel(n) || n._p) return;
+          if (!S.demo && n.h === S.hand) return;
           if (S.cursor >= n.s && S.cursor < n.s + 0.5) {
             n._p = true;
             const m = tm(n);
-            audio.noteOn(m, 0.45);
+            audio.noteOn(m, S.demo ? 0.7 : 0.45);
             paintKey(m, true, n.h);
-            setTimeout(() => { audio.noteOff(m); paintKey(m, false, null); n._p = false; }, n.d * unitSec() * 1000);
+            if (S.demo) fingerChipOn(m, n.f, n.h);
+            setTimeout(() => { audio.noteOff(m); paintKey(m, false, null); fingerChipOff(m); n._p = false; }, n.d * unitSec() * 1000);
           }
         });
       }
@@ -682,7 +771,8 @@ function frame(ts) {
 
     const end = S.loop ? S.loop[1] : S.piece.totalUnits + 4;
     if (S.cursor >= end) {
-      if (S.loop) { S.cursor = S.loop[0]; clearResultsOutsideLoop(); renderTrouble(); }
+      if (S.demo) { stopDemo(); }
+      else if (S.loop) { S.cursor = S.loop[0]; clearResultsOutsideLoop(); renderTrouble(); }
       else { stop(); S.cursor = pickup() - 4; }
     }
   }
@@ -896,13 +986,13 @@ function paintNextKeys() {
   const want = [];
   if (S.playing && S.wait && S.waitingAt !== null) {
     activeNotes().forEach(n => {
-      if (Math.abs(n.s - S.waitingAt) < 0.001 && !S.results.has(S.piece.notes.indexOf(n))) want.push({ m: tm(n), h: n.h });
+      if (Math.abs(n.s - S.waitingAt) < 0.001 && !S.results.has(S.piece.notes.indexOf(n))) want.push({ m: tm(n), h: n.h, f: n.f });
     });
   }
   if (want.length === litTargets.length && want.every((t, i) => t.m === litTargets[i].m && t.h === litTargets[i].h)) return;
-  litTargets.forEach(t => { const k = kb && kb.keys.get(t.m); if (k) k.classList.remove('target', 't-l', 't-r'); });
+  litTargets.forEach(t => { const k = kb && kb.keys.get(t.m); if (k) k.classList.remove('target', 't-l', 't-r'); fingerChipOff(t.m); });
   litTargets = want;
-  litTargets.forEach(t => { const k = kb && kb.keys.get(t.m); if (k) k.classList.add('target', t.h === 'l' ? 't-l' : 't-r'); });
+  litTargets.forEach(t => { const k = kb && kb.keys.get(t.m); if (k) k.classList.add('target', t.h === 'l' ? 't-l' : 't-r'); fingerChipOn(t.m, t.f, t.h); });
 }
 
 /* Plain English, always on screen, saying what to do right now. */
@@ -937,8 +1027,17 @@ function updateCoach() {
     }
   } else if (S.read) {
     msg = 'Read mode. The blocks are hidden, so play from the music above.';
+  } else if (S.demo) {
+    msg = 'Demo: the app is playing this piece itself. Watch the keys and the hand colours, then press Stop demo to try it.';
   } else {
     msg = 'Follow the blocks down to the keys. Take your time.';
+    if (S.wait && S.session.hit >= 8) {
+      const acc = Math.round(S.session.hit / Math.max(1, S.session.notes) * 100);
+      const tim = Math.round(S.session.timing / S.session.hit * 100);
+      if (acc >= 70 && tim < 40) {
+        msg = 'You are finding the right keys. Now try to catch each block as it lands, to lift your In time score.';
+      }
+    }
   }
 
   if (msg !== lastCoach) { box.textContent = msg; lastCoach = msg; }
@@ -1235,7 +1334,8 @@ function updateTransposeUI() {
 }
 
 function bindControls() {
-  el('playBtn').addEventListener('click', () => S.playing ? stop() : start());
+  el('playBtn').addEventListener('click', () => { if (S.demo) { stopDemo(); return; } S.playing ? stop() : start(); });
+  el('demoBtn').addEventListener('click', () => S.demo ? stopDemo() : startDemo());
   el('restartBtn').addEventListener('click', restart);
   el('shareLinkBtn').addEventListener('click', () => {
     LPKShare.shareLink(`https://learnpianokeys.com/app.html?piece=${S.piece.id}`,

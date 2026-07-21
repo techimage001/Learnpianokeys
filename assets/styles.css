@@ -222,6 +222,16 @@ main.narrow h2 { font-size: 1.25rem; font-family: var(--body); font-weight: 600;
   0%, 100% { box-shadow: inset 0 0 0 3px var(--tg), 0 0 10px 2px var(--tg); }
   50% { box-shadow: inset 0 0 0 6px var(--tg), 0 0 22px 7px var(--tg); }
 }
+@media (max-width: 700px) {
+  .wkey.target.t-l { background: linear-gradient(180deg,#E4F2FA 0%, #A9D3E9 100%); }
+  .wkey.target.t-r { background: linear-gradient(180deg,#FAE6E4 0%, #EBB1AD 100%); }
+  .bkey.target.t-l { background: linear-gradient(180deg,#3E6B84 0%, #24485C 100%); }
+  .bkey.target.t-r { background: linear-gradient(180deg,#8C4642 0%, #5F2C29 100%); }
+  @keyframes target {
+    0%, 100% { box-shadow: inset 0 0 0 4px var(--tg), 0 0 12px 3px var(--tg); }
+    50% { box-shadow: inset 0 0 0 8px var(--tg), 0 0 26px 9px var(--tg); }
+  }
+}
 .wkey.lit { background: linear-gradient(180deg,#FFF0C8 0%, #EBD79C 100%); }
 .bkey.lit { background: linear-gradient(180deg,#7A5F26 0%, #4A3812 100%); }
 .wkey.middle-c { box-shadow: inset 0 -6px 8px -6px rgba(0,0,0,.35), inset 0 0 0 2px rgba(212,163,67,.5); }
@@ -233,7 +243,22 @@ main.narrow h2 { font-size: 1.25rem; font-family: var(--body); font-weight: 600;
   position: absolute; bottom: 26px; left: 0; right: 0; text-align: center;
   font-family: var(--mono); font-size: .72rem; font-weight: 600; color: var(--felt); pointer-events: none;
 }
+.bkey .kn {
+  position: absolute; bottom: 6px; left: 0; right: 0; text-align: center;
+  font-family: var(--mono); font-size: .5rem; font-weight: 700; color: #C9BCA8; pointer-events: none;
+}
 .keys.hide-names .kn { display: none; }
+
+/* Finger chip: which finger presses this key, in the hand's colour. */
+.fchip {
+  position: absolute; left: 50%; transform: translateX(-50%); bottom: 34%;
+  min-width: 17px; height: 17px; line-height: 17px; border-radius: 50%;
+  font-family: var(--mono); font-size: .62rem; font-weight: 700; text-align: center;
+  pointer-events: none; z-index: 5;
+}
+.fchip.fc-l { background: var(--hand-l); color: #0E2431; }
+.fchip.fc-r { background: var(--hand-r); color: #2E0C0A; }
+.bkey .fchip { bottom: 12%; }
 
 /* ---------- cards and grids ---------- */
 .grid { display: grid; gap: 20px; }
@@ -381,11 +406,22 @@ body.wide main { max-width: 1180px; margin: 0 auto; }
 }
 .badge.status.ok::before { background: var(--good); }
 .badge.status.warn::before { background: var(--brass); }
+.badge.sess { position: relative; }
+.badge.sess::before {
+  content: ''; position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 7px; height: 7px; border-radius: 50%; background: var(--brass);
+}
+.badge.sess.paused::before { background: var(--ivory-3); }
 button.badge { border: 0; cursor: pointer; font: inherit; font-family: var(--mono); font-size: .7rem; letter-spacing: .08em; line-height: inherit; }
 button.badge:hover { box-shadow: inset 0 0 0 1px rgba(244,237,226,.25); }
 
 /* The quiet session clock, and the way out of a session. */
-.badge.sess { font-variant-numeric: tabular-nums; }
+.badge.sess {
+  font-variant-numeric: tabular-nums;
+  font-size: .95rem; font-weight: 700; color: var(--brass);
+  background: var(--ink); box-shadow: inset 0 0 0 1px var(--brass-dim);
+  padding: 7px 14px 7px 26px;
+}
 .badge.sess.paused { opacity: .55; }
 .badge.sess-finish { background: var(--brass); color: var(--brass-ink); }
 .badge.sess-finish:hover { box-shadow: none; filter: brightness(1.06); }

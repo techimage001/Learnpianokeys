@@ -21,7 +21,7 @@
   var banked = 0;            /* ms accumulated while paused */
   var running = true;
   var lastActivity = Date.now();
-  var savedMins = 0;         /* whole minutes already written to the store */
+  var savedSecs = 0;         /* whole seconds already written to the store */
   var finished = false;
 
   function elapsedMs() { return banked + (running ? Date.now() - startAt : 0); }
@@ -58,11 +58,11 @@
     if (!running && !document.hidden && !finished) resume();
   }
 
-  function saveMinutes() {
-    var mins = Math.floor(elapsedMs() / 60000) - savedMins;
-    if (mins >= 1 && typeof LPK !== 'undefined') {
-      LPK.addMinutes(mins);
-      savedMins += mins;
+  function saveTime() {
+    var secs = Math.floor(elapsedMs() / 1000) - savedSecs;
+    if (secs >= 1 && typeof LPK !== 'undefined') {
+      LPK.addSeconds(secs);
+      savedSecs += secs;
     }
   }
 
@@ -136,10 +136,9 @@
   function showDone() {
     finished = true;
     pause();
-    saveMinutes();
+    saveTime();
 
-    var s = (typeof LPK !== 'undefined') ? LPK.load() : {};
-    var todayMins = (s.minutes || {})[(typeof LPK !== 'undefined') ? LPK.today() : ''] || 0;
+    var todaySec = (typeof LPK !== 'undefined') ? LPK.secOn(LPK.today()) : 0;
     var streak = (typeof LPK !== 'undefined') ? LPK.streak() : 0;
 
     var old = document.getElementById('sessDone');
@@ -161,7 +160,7 @@
     var stats = document.createElement('div');
     stats.className = 'sess-stats';
     [[fmt(elapsedMs()), 'this session'],
-     [todayMins + ' min', 'saved today'],
+     [(typeof LPK !== 'undefined') ? LPK.fmtDur(todaySec) : '0 sec', 'saved today'],
      [streak + (streak === 1 ? ' day' : ' days'), 'streak']].forEach(function (pair) {
       var d = document.createElement('div');
       var b = document.createElement('b');
@@ -171,13 +170,6 @@
       stats.appendChild(d);
     });
     card.appendChild(stats);
-
-    if (Math.floor(elapsedMs() / 60000) < 1) {
-      var note = document.createElement('p');
-      note.className = 'score-note';
-      note.textContent = 'Sessions under a minute are not saved, so a stray click never pads your record.';
-      card.appendChild(note);
-    }
 
     var moti = document.createElement('p');
     moti.className = 'sess-moti';
@@ -221,9 +213,14 @@
   document.addEventListener('pointerdown', activity);
   document.addEventListener('keydown', activity);
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden) { saveMinutes(); pause(); }
+    if (document.hidden) { saveTime(); pause(); }
   });
-  window.addEventListener('pagehide', saveMinutes);
+  window.addEventListener('pagehide', saveTime);
+  window.addEventListener('pageshow', function () {
+    if (!silent) { timeEl.hidden = false; finEl.hidden = false; }
+    activity();
+    paint();
+  });
 
   setInterval(function () {
     if (running && Date.now() - lastActivity > IDLE_MS) pause();

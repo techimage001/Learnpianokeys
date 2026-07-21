@@ -301,6 +301,12 @@ function buildKeybed(container, lowMidi, highMidi, opts = {}) {
     el.style.width = (w * 0.62) + '%';
     el.dataset.midi = m;
     el.setAttribute('aria-hidden', 'true');
+    if (opts.labels) {
+      const lab = document.createElement('span');
+      lab.className = 'kn';
+      lab.textContent = pitchClass(m);
+      el.appendChild(lab);
+    }
     container.appendChild(el);
     keys.set(m, el);
   }
@@ -335,13 +341,41 @@ const LPK = {
     return s;
   },
   addMinutes(mins) {
+    return this.addSeconds(Math.round(mins * 60));
+  },
+  /* Seconds are the canonical unit from V14 on. Days recorded before V14
+     live in the old minutes map and are still counted, never migrated. */
+  addSeconds(sec) {
+    if (!(sec > 0)) return this.load();
     const s = this.load();
-    s.minutes = s.minutes || {};
-    s.minutes[this.today()] = (s.minutes[this.today()] || 0) + mins;
-    s.totalMinutes = (s.totalMinutes || 0) + mins;
+    s.sec = s.sec || {};
+    s.sec[this.today()] = (s.sec[this.today()] || 0) + Math.round(sec);
+    s.totalSec = (s.totalSec || 0) + Math.round(sec);
     this.save(s);
     this.markDay();
     return this.load();
+  },
+  secOn(day) {
+    const s = this.load();
+    return ((s.sec || {})[day] || 0) + (((s.minutes || {})[day] || 0) * 60);
+  },
+  totalSeconds() {
+    const s = this.load();
+    return (s.totalSec || 0) + ((s.totalMinutes || 0) * 60);
+  },
+  practiceDays() {
+    const s = this.load();
+    const set = {};
+    Object.keys(s.minutes || {}).forEach(k => { set[k] = 1; });
+    Object.keys(s.sec || {}).forEach(k => { set[k] = 1; });
+    return Object.keys(set).sort();
+  },
+  fmtDur(sec) {
+    sec = Math.max(0, Math.round(sec));
+    const m = Math.floor(sec / 60), r = sec % 60;
+    if (!m) return r + ' sec';
+    if (!r) return m + ' min';
+    return m + ' min ' + r + ' sec';
   },
   streak() { const s = this.load(); return s.lastDay === this.today() || s.lastDay === this.dayKey(1) ? (s.streak || 0) : 0; }
 };
