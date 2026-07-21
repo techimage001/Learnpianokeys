@@ -354,6 +354,13 @@ ok(/\.nav a\.btn-primary[^{]*\{[^}]*color:\s*var\(--brass-ink\)/.test(css),
   'nav primary button keeps its own text colour (the .nav a specificity trap)');
 ok(/\.nav a\.btn-ghost/.test(css), 'nav ghost button keeps its own text colour');
 {
+  // duplicate @keyframes names resolve differently across engines and once
+  // killed the next-key glow; one name must mean exactly one definition
+  const kf = [...css.matchAll(/@keyframes\s+([A-Za-z0-9_-]+)/g)].map(m => m[1]);
+  const dupes = kf.filter((n, i) => kf.indexOf(n) !== i);
+  ok(dupes.length === 0, 'no duplicate @keyframes names' + (dupes.length ? ' (' + dupes.join(', ') + ')' : ''));
+}
+{
   // every rule that paints a brass background must also set a text colour
   const rules = css.split('}');
   rules.forEach(r => {

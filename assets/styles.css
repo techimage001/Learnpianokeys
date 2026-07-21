@@ -215,22 +215,30 @@ main.narrow h2 { font-size: 1.25rem; font-family: var(--body); font-weight: 600;
 .bkey.on { background: linear-gradient(180deg,#6A5326 0%, #3A2C13 100%); transform: scaleY(.985); }
 .wkey.lh.on, .bkey.lh.on { background: linear-gradient(180deg,#C6E5F5 0%, #6FB6DC 100%); }
 .wkey.rh.on, .bkey.rh.on { background: linear-gradient(180deg,#F2BDB9 0%, #D96E68 100%); }
-.wkey.target, .bkey.target { --tg: var(--brass); animation: target 1.1s ease-in-out infinite; }
+/* One animation, variable-driven, so screen sizes tune thickness without a
+   second @keyframes definition (duplicate names behave differently across
+   browser engines and once killed this glow). */
+.wkey.target, .bkey.target {
+  --tg: var(--brass);
+  --tg-ring: 3px; --tg-ring-2: 6px;
+  --tg-halo: 10px; --tg-spread: 2px; --tg-halo-2: 22px; --tg-spread-2: 7px;
+  animation: target 1.1s ease-in-out infinite;
+}
 .wkey.target.t-l, .bkey.target.t-l { --tg: var(--hand-l); }
 .wkey.target.t-r, .bkey.target.t-r { --tg: var(--hand-r); }
 @keyframes target {
-  0%, 100% { box-shadow: inset 0 0 0 3px var(--tg), 0 0 10px 2px var(--tg); }
-  50% { box-shadow: inset 0 0 0 6px var(--tg), 0 0 22px 7px var(--tg); }
+  0%, 100% { box-shadow: inset 0 0 0 var(--tg-ring) var(--tg), 0 0 var(--tg-halo) var(--tg-spread) var(--tg); }
+  50% { box-shadow: inset 0 0 0 var(--tg-ring-2) var(--tg), 0 0 var(--tg-halo-2) var(--tg-spread-2) var(--tg); }
 }
 @media (max-width: 700px) {
+  .wkey.target, .bkey.target {
+    --tg-ring: 4px; --tg-ring-2: 8px;
+    --tg-halo: 12px; --tg-spread: 3px; --tg-halo-2: 26px; --tg-spread-2: 9px;
+  }
   .wkey.target.t-l { background: linear-gradient(180deg,#E4F2FA 0%, #A9D3E9 100%); }
   .wkey.target.t-r { background: linear-gradient(180deg,#FAE6E4 0%, #EBB1AD 100%); }
   .bkey.target.t-l { background: linear-gradient(180deg,#3E6B84 0%, #24485C 100%); }
   .bkey.target.t-r { background: linear-gradient(180deg,#8C4642 0%, #5F2C29 100%); }
-  @keyframes target {
-    0%, 100% { box-shadow: inset 0 0 0 4px var(--tg), 0 0 12px 3px var(--tg); }
-    50% { box-shadow: inset 0 0 0 8px var(--tg), 0 0 26px 9px var(--tg); }
-  }
 }
 .wkey.lit { background: linear-gradient(180deg,#FFF0C8 0%, #EBD79C 100%); }
 .bkey.lit { background: linear-gradient(180deg,#7A5F26 0%, #4A3812 100%); }
@@ -244,8 +252,10 @@ main.narrow h2 { font-size: 1.25rem; font-family: var(--body); font-weight: 600;
   font-family: var(--mono); font-size: .72rem; font-weight: 600; color: var(--felt); pointer-events: none;
 }
 .bkey .kn {
-  position: absolute; bottom: 6px; left: 0; right: 0; text-align: center;
-  font-family: var(--mono); font-size: .5rem; font-weight: 700; color: #C9BCA8; pointer-events: none;
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  writing-mode: vertical-rl; text-orientation: upright;
+  font-family: var(--mono); font-size: .68rem; font-weight: 700; letter-spacing: 1px;
+  color: #C9BCA8; pointer-events: none;
 }
 .keys.hide-names .kn { display: none; }
 
@@ -258,7 +268,7 @@ main.narrow h2 { font-size: 1.25rem; font-family: var(--body); font-weight: 600;
 }
 .fchip.fc-l { background: var(--hand-l); color: #0E2431; }
 .fchip.fc-r { background: var(--hand-r); color: #2E0C0A; }
-.bkey .fchip { bottom: 12%; }
+.bkey .fchip { bottom: 42%; }
 
 /* ---------- cards and grids ---------- */
 .grid { display: grid; gap: 20px; }
@@ -425,6 +435,24 @@ button.badge:hover { box-shadow: inset 0 0 0 1px rgba(244,237,226,.25); }
 .badge.sess.paused { opacity: .55; }
 .badge.sess-finish { background: var(--brass); color: var(--brass-ink); }
 .badge.sess-finish:hover { box-shadow: none; filter: brightness(1.06); }
+
+/* Rotate tip: phones held upright only. Never shown on desktops or laptops,
+   and it removes itself the moment the phone is turned sideways. */
+.rotate-tip { display: none; }
+@media (max-width: 700px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  .rotate-tip {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin: 10px 0 0; padding: 9px 12px;
+    background: var(--ink-2); border: 1px solid var(--ink-4); border-radius: 10px;
+    font-size: .78rem; color: var(--ivory-2);
+  }
+}
+.rotate-tip[hidden] { display: none !important; }
+.rotate-tip-close {
+  background: none; border: 1px solid var(--ink-4); border-radius: 999px;
+  color: var(--ivory-2); font: inherit; font-size: .7rem; padding: 4px 10px;
+  cursor: pointer; white-space: nowrap;
+}
 
 /* Resume strip and start afresh. */
 .resume-strip {

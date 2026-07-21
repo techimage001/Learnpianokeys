@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ASSET_V = '14';
+const ASSET_V = '15';
 const SITE = 'https://learnpianokeys.com';
 const AUTHOR = 'Learn Piano Keys';
 const BUILT = new Date().toISOString().slice(0, 10);

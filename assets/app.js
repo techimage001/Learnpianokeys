@@ -135,6 +135,7 @@ function boot() {
       LOW = r2[0]; HIGH = r2[1];
       kb = buildKeybed(el('keys'), LOW, HIGH, { labels: true, markC: true });
       el('keys').classList.toggle('hide-names', !S.showNames);
+      litTargets = []; /* the new keys have no classes yet; force the glow to repaint */
     }
     sizeCanvases();
   });
@@ -1410,6 +1411,17 @@ function bindControls() {
   });
 
   el('micBadge').addEventListener('click', () => el('micMode').click());
+
+  const tip = el('rotateTip');
+  if (tip) {
+    if (LPK.load().rotateTipDismissed) tip.hidden = true;
+    el('rotateTipClose').addEventListener('click', () => {
+      tip.hidden = true;
+      const st = LPK.load();
+      st.rotateTipDismissed = true;
+      LPK.save(st);
+    });
+  }
 
   el('clearLoop').addEventListener('click', () => {
     S.loop = null;
